@@ -13,6 +13,8 @@ export interface Problem {
   pattern: string;
   prompt: string;
   fnName: string;
+  tags?: string[]; // e.g. "aws" for problems likely/confirmed asked in AWS interviews
+  patternKey?: string; // links to a pattern in lib/cheatsheet.ts
   starter: Record<Lang, string>;
   solution: Record<Lang, string>;
   tests: TestCase[];
@@ -814,6 +816,362 @@ func main() {
 }
 `;
 
+const rightSideViewGoHarness = (code: string) => `package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+${treeGoPrelude}
+
+${code}
+
+func eqIntSliceRSV(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func main() {
+	type result struct {
+		Pass   bool  \`json:"pass"\`
+		Output []int \`json:"output"\`
+	}
+	results := []result{}
+	out1 := rightSideView(buildTree1())
+	results = append(results, result{Pass: eqIntSliceRSV(out1, []int{3, 20, 7}), Output: out1})
+	out2 := rightSideView(buildTree2())
+	results = append(results, result{Pass: eqIntSliceRSV(out2, []int{1, 2}), Output: out2})
+	b, _ := json.Marshal(results)
+	fmt.Println("__RESULTS__" + string(b))
+}
+`;
+
+const invertTreeGoHarness = (code: string) => `package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+${code}
+
+func serializeInv(n *TreeNode) []int {
+	if n == nil {
+		return []int{-9999}
+	}
+	out := []int{n.Val}
+	out = append(out, serializeInv(n.Left)...)
+	out = append(out, serializeInv(n.Right)...)
+	return out
+}
+
+func eqIntSliceInv(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func main() {
+	type result struct {
+		Pass   bool  \`json:"pass"\`
+		Output []int \`json:"output"\`
+	}
+	results := []result{}
+
+	t1 := &TreeNode{Val: 2, Left: &TreeNode{Val: 1}, Right: &TreeNode{Val: 3}}
+	want1 := serializeInv(&TreeNode{Val: 2, Left: &TreeNode{Val: 3}, Right: &TreeNode{Val: 1}})
+	out1 := serializeInv(invertTree(t1))
+	results = append(results, result{Pass: eqIntSliceInv(out1, want1), Output: out1})
+
+	out2 := invertTree(nil)
+	results = append(results, result{Pass: out2 == nil, Output: []int{}})
+
+	b, _ := json.Marshal(results)
+	fmt.Println("__RESULTS__" + string(b))
+}
+`;
+
+const validateBstGoHarness = (code: string) => `package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+${code}
+
+func main() {
+	type result struct {
+		Pass   bool \`json:"pass"\`
+		Output bool \`json:"output"\`
+	}
+	results := []result{}
+
+	t1 := &TreeNode{Val: 2, Left: &TreeNode{Val: 1}, Right: &TreeNode{Val: 3}}
+	out1 := isValidBST(t1)
+	results = append(results, result{Pass: out1 == true, Output: out1})
+
+	t2 := &TreeNode{Val: 5, Left: &TreeNode{Val: 1}, Right: &TreeNode{Val: 4, Left: &TreeNode{Val: 3}, Right: &TreeNode{Val: 6}}}
+	out2 := isValidBST(t2)
+	results = append(results, result{Pass: out2 == false, Output: out2})
+
+	b, _ := json.Marshal(results)
+	fmt.Println("__RESULTS__" + string(b))
+}
+`;
+
+const diameterGoHarness = (code: string) => `package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type TreeNode struct {
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
+
+${code}
+
+func main() {
+	type result struct {
+		Pass   bool \`json:"pass"\`
+		Output int  \`json:"output"\`
+	}
+	results := []result{}
+
+	t1 := &TreeNode{Val: 1,
+		Left:  &TreeNode{Val: 2, Left: &TreeNode{Val: 4}, Right: &TreeNode{Val: 5}},
+		Right: &TreeNode{Val: 3},
+	}
+	out1 := diameterOfBinaryTree(t1)
+	results = append(results, result{Pass: out1 == 3, Output: out1})
+
+	t2 := &TreeNode{Val: 1, Left: &TreeNode{Val: 2}}
+	out2 := diameterOfBinaryTree(t2)
+	results = append(results, result{Pass: out2 == 1, Output: out2})
+
+	b, _ := json.Marshal(results)
+	fmt.Println("__RESULTS__" + string(b))
+}
+`;
+
+const wordLadderGoHarness = (code: string) => `package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+${code}
+
+func main() {
+	type tc struct {
+		Begin string
+		End   string
+		Words []string
+		Want  int
+	}
+	tests := []tc{
+		{Begin: "hit", End: "cog", Words: []string{"hot", "dot", "dog", "lot", "log", "cog"}, Want: 5},
+		{Begin: "hit", End: "cog", Words: []string{"hot", "dot", "dog", "lot", "log"}, Want: 0},
+	}
+	type result struct {
+		Pass   bool \`json:"pass"\`
+		Output int  \`json:"output"\`
+	}
+	results := []result{}
+	for _, t := range tests {
+		out := ladderLength(t.Begin, t.End, t.Words)
+		results = append(results, result{Pass: out == t.Want, Output: out})
+	}
+	b, _ := json.Marshal(results)
+	fmt.Println("__RESULTS__" + string(b))
+}
+`;
+
+const findCircleNumGoHarness = (code: string) => `package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+${code}
+
+func main() {
+	type tc struct {
+		Grid [][]int
+		Want int
+	}
+	tests := []tc{
+		{Grid: [][]int{{1, 1, 0}, {1, 1, 0}, {0, 0, 1}}, Want: 2},
+		{Grid: [][]int{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, Want: 3},
+	}
+	type result struct {
+		Pass   bool \`json:"pass"\`
+		Output int  \`json:"output"\`
+	}
+	results := []result{}
+	for _, t := range tests {
+		out := findCircleNum(t.Grid)
+		results = append(results, result{Pass: out == t.Want, Output: out})
+	}
+	b, _ := json.Marshal(results)
+	fmt.Println("__RESULTS__" + string(b))
+}
+`;
+
+const orangesRottingGoHarness = (code: string) => `package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+${code}
+
+func main() {
+	type tc struct {
+		Grid [][]int
+		Want int
+	}
+	tests := []tc{
+		{Grid: [][]int{{2, 1, 1}, {1, 1, 0}, {0, 1, 1}}, Want: 4},
+		{Grid: [][]int{{2, 1, 1}, {0, 1, 1}, {1, 0, 1}}, Want: -1},
+	}
+	type result struct {
+		Pass   bool \`json:"pass"\`
+		Output int  \`json:"output"\`
+	}
+	results := []result{}
+	for _, t := range tests {
+		gridCopy := make([][]int, len(t.Grid))
+		for i, row := range t.Grid {
+			gridCopy[i] = append([]int{}, row...)
+		}
+		out := orangesRotting(gridCopy)
+		results = append(results, result{Pass: out == t.Want, Output: out})
+	}
+	b, _ := json.Marshal(results)
+	fmt.Println("__RESULTS__" + string(b))
+}
+`;
+
+const lruCacheGoHarness = (code: string) => `package main
+
+import (
+	"container/list"
+	"encoding/json"
+	"fmt"
+)
+
+type Op struct {
+	Name string
+	A    int
+	B    int
+}
+
+${code}
+
+func eqIntSliceLRU(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func main() {
+	ops := []Op{
+		{Name: "put", A: 1, B: 1},
+		{Name: "put", A: 2, B: 2},
+		{Name: "get", A: 1},
+		{Name: "put", A: 3, B: 3},
+		{Name: "get", A: 2},
+		{Name: "put", A: 4, B: 4},
+		{Name: "get", A: 1},
+		{Name: "get", A: 3},
+		{Name: "get", A: 4},
+	}
+	want := []int{1, -1, -1, 3, 4}
+	out := lruCache(2, ops)
+	type result struct {
+		Pass   bool  \`json:"pass"\`
+		Output []int \`json:"output"\`
+	}
+	results := []result{{Pass: eqIntSliceLRU(out, want), Output: out}}
+	b, _ := json.Marshal(results)
+	fmt.Println("__RESULTS__" + string(b))
+	_ = list.New // keep import used even if a solution implements it differently
+}
+`;
+
+const kthLargestGoHarness = (code: string) => `package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+${code}
+
+func main() {
+	type tc struct {
+		Nums []int
+		K    int
+		Want int
+	}
+	tests := []tc{
+		{Nums: []int{3, 2, 1, 5, 6, 4}, K: 2, Want: 5},
+		{Nums: []int{3, 2, 3, 1, 2, 4, 5, 5, 6}, K: 4, Want: 4},
+	}
+	type result struct {
+		Pass   bool \`json:"pass"\`
+		Output int  \`json:"output"\`
+	}
+	results := []result{}
+	for _, t := range tests {
+		out := findKthLargest(t.Nums, t.K)
+		results = append(results, result{Pass: out == t.Want, Output: out})
+	}
+	b, _ := json.Marshal(results)
+	fmt.Println("__RESULTS__" + string(b))
+}
+`;
+
 export const PROBLEMS: Problem[] = [
   {
     slug: "two-sum",
@@ -824,6 +1182,7 @@ export const PROBLEMS: Problem[] = [
     prompt:
       "You get a list of numbers and a target number. Find the two numbers in the list that add up to the target. Return their positions (index), not the numbers themselves. Each input has exactly one answer, and you cannot use the same number twice.",
     fnName: "twoSum",
+    patternKey: "hashmap-lookup",
     starter: {
       javascript: `function twoSum(nums, target) {
   // write your code here
@@ -885,6 +1244,7 @@ export const PROBLEMS: Problem[] = [
     prompt:
       "You get a string. Find the length of the longest piece of it, taken without skipping any letters, that has no repeated character inside it.",
     fnName: "lengthOfLongestSubstring",
+    patternKey: "sliding-window",
     starter: {
       javascript: `function lengthOfLongestSubstring(s) {
   // write your code here
@@ -957,6 +1317,7 @@ export const PROBLEMS: Problem[] = [
     prompt:
       "You get a list of wall heights. Pick two walls so that, together with the ground between them, they hold the most water. Return the amount of water held (width times the shorter wall).",
     fnName: "maxArea",
+    patternKey: "two-pointers",
     starter: {
       javascript: `function maxArea(height) {
   // write your code here
@@ -1032,6 +1393,7 @@ export const PROBLEMS: Problem[] = [
     prompt:
       "You get a list of numbers that was sorted but then rotated at some unknown point, and a target number. Find the index of the target in the list. If it is not there, return -1. Your answer must look at far fewer than all the numbers.",
     fnName: "searchRotated",
+    patternKey: "binary-search",
     starter: {
       javascript: `function searchRotated(nums, target) {
   // write your code here
@@ -1120,6 +1482,7 @@ export const PROBLEMS: Problem[] = [
     prompt:
       "You get a list of time ranges, each with a start and an end. Some of them overlap. Merge all the ranges that overlap and return the smallest list of ranges that covers the same time.",
     fnName: "mergeIntervals",
+    patternKey: "greedy-intervals",
     starter: {
       javascript: `function mergeIntervals(intervals) {
   // write your code here
@@ -1220,6 +1583,7 @@ func mergeIntervals(intervals [][]int) [][]int {
     prompt:
       "You get a string made only of the characters ( ) [ ] { }. Say whether every opening bracket has a matching closing bracket in the right order, with nothing crossed.",
     fnName: "isValid",
+    patternKey: "stack-matching",
     starter: {
       javascript: `function isValid(s) {
   // write your code here
@@ -1292,6 +1656,8 @@ func mergeIntervals(intervals [][]int) [][]int {
     prompt:
       "You get a grid of \"1\" (land) and \"0\" (water). Land cells that touch up, down, left, or right belong to the same island. Count how many separate islands are in the grid.",
     fnName: "numIslands",
+    patternKey: "dfs-flood-fill",
+    tags: ["aws"],
     starter: {
       javascript: `function numIslands(grid) {
   // write your code here
@@ -1407,6 +1773,7 @@ func mergeIntervals(intervals [][]int) [][]int {
     prompt:
       "You get a list of coin values and a target amount. Using as many coins as you like of any value, find the smallest number of coins that add up exactly to the amount. If it cannot be made, return -1.",
     fnName: "coinChange",
+    patternKey: "dp-1d",
     starter: {
       javascript: `function coinChange(coins, amount) {
   // write your code here
@@ -1476,6 +1843,7 @@ func mergeIntervals(intervals [][]int) [][]int {
     prompt:
       "You get a list of different numbers. Return every possible group you can make from them, including the empty group and the group with everything in it.",
     fnName: "subsets",
+    patternKey: "backtracking",
     starter: {
       javascript: `function subsets(nums) {
   // write your code here
@@ -1551,6 +1919,7 @@ func mergeIntervals(intervals [][]int) [][]int {
     prompt:
       "You get a list of numbers and a number k. Return the k numbers that appear most often in the list, in any order.",
     fnName: "topKFrequent",
+    patternKey: "heap-topk",
     starter: {
       javascript: `function topKFrequent(nums, k) {
   // write your code here
@@ -1631,6 +2000,7 @@ func mergeIntervals(intervals [][]int) [][]int {
     prompt:
       "You get a list of numbers that is already sorted, with no repeats, and a target number. Find the index of the target. If it is not in the list, return -1.",
     fnName: "binarySearch",
+    patternKey: "binary-search",
     starter: {
       javascript: `function binarySearch(arr, target) {
   // write your code here
@@ -1699,6 +2069,7 @@ func mergeIntervals(intervals [][]int) [][]int {
     prompt:
       "You get a sorted list that may have repeated numbers, and a target number. Return the first index whose value is greater than or equal to the target. If no such value exists, return the length of the list.",
     fnName: "lowerBound",
+    patternKey: "binary-search",
     starter: {
       javascript: `function lowerBound(arr, target) {
   // write your code here
@@ -1762,6 +2133,7 @@ func mergeIntervals(intervals [][]int) [][]int {
     prompt:
       "You get a list of lectures, each with a start and end time, and one hall. Pick as many lectures as possible so that none of the picked ones overlap. Return how many you can fit.",
     fnName: "maxLectures",
+    patternKey: "greedy-intervals",
     starter: {
       javascript: `function maxLectures(lectures) {
   // write your code here
@@ -1848,6 +2220,7 @@ func maxLectures(lectures [][]int) int {
     prompt:
       "You get a list of lectures, each with a start and end time. Find the smallest number of halls needed so that no two overlapping lectures ever share a hall.",
     fnName: "minHalls",
+    patternKey: "greedy-intervals",
     starter: {
       javascript: `function minHalls(lectures) {
   // write your code here
@@ -1950,6 +2323,7 @@ func minHalls(lectures [][]int) int {
     prompt:
       "You get a list of values representing a linked list, in order from the head. Reverse it and return the new order, using the same prev/curr/next pointer idea a real linked list reversal uses (shown here as a plain list for simplicity).",
     fnName: "reverseList",
+    patternKey: "linked-list-pointers",
     starter: {
       javascript: `function reverseList(list) {
   // write your code here
@@ -2001,6 +2375,7 @@ func minHalls(lectures [][]int) int {
     prompt:
       "A linked list is given as a 'next' list: next[i] is the index of the node after node i, or -1 if there is none. Starting from a head index, say whether the list loops back on itself anywhere.",
     fnName: "hasCycle",
+    patternKey: "linked-list-pointers",
     starter: {
       javascript: `function hasCycle(next, head) {
   // write your code here
@@ -2061,6 +2436,8 @@ func minHalls(lectures [][]int) int {
     prompt:
       "You get a binary tree, written as null or [value, leftSubtree, rightSubtree]. Return the number of nodes along the longest path from the root down to a leaf.",
     fnName: "maxDepth",
+    patternKey: "tree-dfs",
+    tags: ["aws"],
     starter: {
       javascript: `function maxDepth(root) {
   // root is null, or [value, left, right]
@@ -2116,6 +2493,8 @@ func minHalls(lectures [][]int) int {
     prompt:
       "You get a binary tree, written as null or [value, leftSubtree, rightSubtree]. Return its values level by level, from the root down, each level as its own list, left to right.",
     fnName: "levelOrder",
+    patternKey: "bfs",
+    tags: ["aws"],
     starter: {
       javascript: `function levelOrder(root) {
   // root is null, or [value, left, right]
@@ -2212,6 +2591,8 @@ func minHalls(lectures [][]int) int {
     prompt:
       "You get a graph as a list of connections from each node to its neighbors, plus a start node and a target node. Return the smallest number of connections needed to get from start to target, or -1 if it cannot be reached.",
     fnName: "shortestPath",
+    patternKey: "bfs",
+    tags: ["aws"],
     starter: {
       javascript: `function shortestPath(graph, start, target) {
   // graph is an object like { A: ["B", "C"], ... }
@@ -2312,6 +2693,7 @@ func minHalls(lectures [][]int) int {
     prompt:
       "You get a list of amounts of money in houses along a street. You cannot rob two houses that are next to each other. Return the largest total you can rob.",
     fnName: "rob",
+    patternKey: "dp-1d",
     starter: {
       javascript: `function rob(nums) {
   // write your code here
@@ -2373,6 +2755,8 @@ func minHalls(lectures [][]int) int {
     prompt:
       "There are n courses numbered 0 to n-1. Each pair [a, b] in the prerequisites list means you must take course b before course a. Return whether it is possible to finish every course.",
     fnName: "canFinish",
+    patternKey: "bfs",
+    tags: ["aws"],
     starter: {
       javascript: `function canFinish(n, prerequisites) {
   // write your code here
@@ -2481,8 +2865,977 @@ func minHalls(lectures [][]int) int {
     explanation:
       "Every course keeps count of how many prerequisites it is still waiting on. We start with the courses that need nothing first and put them in a waiting line. Each time we take a course off the line, we tell every course that depended on it that one of its requirements is now done, lowering its waiting count by one. Any course whose count reaches zero joins the line too. If we manage to take every single course this way, there was no deadlock; if some are left stuck waiting on each other, finishing all of them is impossible.",
   },
+  {
+    slug: "right-side-view",
+    title: "Binary Tree Right Side View",
+    topic: "Trees",
+    difficulty: "Medium",
+    pattern: "DFS, right child first, first value per depth",
+    tags: ["aws"],
+    patternKey: "tree-dfs",
+    prompt:
+      "You get a binary tree, written as null or [value, leftSubtree, rightSubtree]. Imagine standing to the right of the tree. Return the values you would see, ordered from the top of the tree down.",
+    fnName: "rightSideView",
+    starter: {
+      javascript: `function rightSideView(root) {
+  // root is null, or [value, left, right]
+  // write your code here
+}`,
+      python: `def right_side_view(root):
+    # root is None, or [value, left, right]
+    # write your code here
+    pass`,
+      go: `func rightSideView(root *TreeNode) []int {
+	// write your code here
+	return []int{}
+}`,
+    },
+    solution: {
+      javascript: `function rightSideView(root) {
+  const result = [];
+  function dfs(node, depth) {
+    if (node === null) return;
+    const [val, left, right] = node;
+    if (depth === result.length) result.push(val);
+    dfs(right, depth + 1);
+    dfs(left, depth + 1);
+  }
+  dfs(root, 0);
+  return result;
+}`,
+      python: `def right_side_view(root):
+    result = []
+
+    def dfs(node, depth):
+        if node is None:
+            return
+        val, left, right = node
+        if depth == len(result):
+            result.append(val)
+        dfs(right, depth + 1)
+        dfs(left, depth + 1)
+
+    dfs(root, 0)
+    return result`,
+      go: `func rightSideView(root *TreeNode) []int {
+	result := []int{}
+	var dfs func(node *TreeNode, depth int)
+	dfs = func(node *TreeNode, depth int) {
+		if node == nil {
+			return
+		}
+		if depth == len(result) {
+			result = append(result, node.Val)
+		}
+		dfs(node.Right, depth+1)
+		dfs(node.Left, depth+1)
+	}
+	dfs(root, 0)
+	return result
+}`,
+    },
+    tests: [
+      {
+        input: [[3, [9, null, null], [20, [15, null, null], [7, null, null]]]],
+        expected: [3, 20, 7],
+      },
+      { input: [[1, null, [2, null, null]]], expected: [1, 2] },
+    ],
+    goHarness: rightSideViewGoHarness,
+    complexity: { time: "O(n)", space: "O(h), h = tree height" },
+    explanation:
+      "This is the exact same depth-first walk as finding a tree's depth, with two small changes. First, at every node we visit the right child before the left child, so the first node we reach at each depth is always the rightmost one. Second, we only record a value the first time we reach its depth, since any node reached after that at the same depth is hidden behind the one already recorded. This is the classic AWS-style twist on a plain tree DFS: same shape, mirrored direction.",
+  },
+  {
+    slug: "invert-binary-tree",
+    title: "Invert a Binary Tree",
+    topic: "Trees",
+    difficulty: "Easy",
+    pattern: "DFS, swap children on the way back up",
+    tags: ["aws"],
+    patternKey: "tree-dfs",
+    prompt:
+      "You get a binary tree, written as null or [value, leftSubtree, rightSubtree]. Return the tree with every node's left and right children swapped, all the way down.",
+    fnName: "invertTree",
+    starter: {
+      javascript: `function invertTree(root) {
+  // root is null, or [value, left, right]
+  // write your code here
+}`,
+      python: `def invert_tree(root):
+    # root is None, or [value, left, right]
+    # write your code here
+    pass`,
+      go: `func invertTree(root *TreeNode) *TreeNode {
+	// write your code here
+	return nil
+}`,
+    },
+    solution: {
+      javascript: `function invertTree(root) {
+  if (root === null) return null;
+  const [val, left, right] = root;
+  return [val, invertTree(right), invertTree(left)];
+}`,
+      python: `def invert_tree(root):
+    if root is None:
+        return None
+    val, left, right = root
+    return [val, invert_tree(right), invert_tree(left)]`,
+      go: `func invertTree(root *TreeNode) *TreeNode {
+	if root == nil {
+		return nil
+	}
+	root.Left, root.Right = invertTree(root.Right), invertTree(root.Left)
+	return root
+}`,
+    },
+    tests: [
+      {
+        input: [[2, [1, null, null], [3, null, null]]],
+        expected: [2, [3, null, null], [1, null, null]],
+      },
+      { input: [null], expected: null },
+    ],
+    goHarness: invertTreeGoHarness,
+    complexity: { time: "O(n)", space: "O(h), h = tree height" },
+    explanation:
+      "We visit every node once, same shape as any tree DFS. The only change is what we do at each node: instead of reading the left and right children to compute something, we swap them and send the swapped versions back up. Because every node along the way does this same swap, the whole tree ends up mirrored by the time we reach the root again.",
+  },
+  {
+    slug: "validate-bst",
+    title: "Validate Binary Search Tree",
+    topic: "Trees",
+    difficulty: "Medium",
+    pattern: "DFS carrying a shrinking valid range",
+    tags: ["aws"],
+    patternKey: "tree-dfs",
+    prompt:
+      "You get a binary tree, written as null or [value, leftSubtree, rightSubtree]. Say whether it is a valid binary search tree: every node's value must be strictly greater than everything in its left subtree and strictly smaller than everything in its right subtree.",
+    fnName: "isValidBST",
+    starter: {
+      javascript: `function isValidBST(root) {
+  // root is null, or [value, left, right]
+  // write your code here
+}`,
+      python: `def is_valid_bst(root):
+    # root is None, or [value, left, right]
+    # write your code here
+    pass`,
+      go: `func isValidBST(root *TreeNode) bool {
+	// write your code here
+	return false
+}`,
+    },
+    solution: {
+      javascript: `function isValidBST(root) {
+  function dfs(node, low, high) {
+    if (node === null) return true;
+    const [val, left, right] = node;
+    if (!(val > low && val < high)) return false;
+    return dfs(left, low, val) && dfs(right, val, high);
+  }
+  return dfs(root, -Infinity, Infinity);
+}`,
+      python: `def is_valid_bst(root):
+    def dfs(node, low, high):
+        if node is None:
+            return True
+        val, left, right = node
+        if not (low < val < high):
+            return False
+        return dfs(left, low, val) and dfs(right, val, high)
+
+    return dfs(root, float("-inf"), float("inf"))`,
+      go: `func isValidBST(root *TreeNode) bool {
+	var dfs func(node *TreeNode, low, high int) bool
+	const inf = 1 << 60
+	dfs = func(node *TreeNode, low, high int) bool {
+		if node == nil {
+			return true
+		}
+		if !(node.Val > low && node.Val < high) {
+			return false
+		}
+		return dfs(node.Left, low, node.Val) && dfs(node.Right, node.Val, high)
+	}
+	return dfs(root, -inf, inf)
+}`,
+    },
+    tests: [
+      { input: [[2, [1, null, null], [3, null, null]]], expected: true },
+      {
+        input: [
+          [5, [1, null, null], [4, [3, null, null], [6, null, null]]],
+        ],
+        expected: false,
+      },
+    ],
+    goHarness: validateBstGoHarness,
+    complexity: { time: "O(n)", space: "O(h), h = tree height" },
+    explanation:
+      "This uses the same DFS shape as finding a tree's depth, but instead of returning a number upward, we pass a valid (low, high) range downward. The root can be anything. Its left child must stay below the root's value, so we shrink the allowed high bound to the root's value. Its right child must stay above the root's value, so we shrink the allowed low bound instead. If any node ever falls outside the range it inherited, the whole tree is invalid.",
+  },
+  {
+    slug: "diameter-of-binary-tree",
+    title: "Diameter of a Binary Tree",
+    topic: "Trees",
+    difficulty: "Easy",
+    pattern: "DFS height, track a running best on the way up",
+    tags: ["aws"],
+    patternKey: "tree-dfs",
+    prompt:
+      "You get a binary tree, written as null or [value, leftSubtree, rightSubtree]. The diameter is the number of edges on the longest path between any two nodes, and that path does not have to pass through the root. Return the diameter.",
+    fnName: "diameterOfBinaryTree",
+    starter: {
+      javascript: `function diameterOfBinaryTree(root) {
+  // root is null, or [value, left, right]
+  // write your code here
+}`,
+      python: `def diameter_of_binary_tree(root):
+    # root is None, or [value, left, right]
+    # write your code here
+    pass`,
+      go: `func diameterOfBinaryTree(root *TreeNode) int {
+	// write your code here
+	return 0
+}`,
+    },
+    solution: {
+      javascript: `function diameterOfBinaryTree(root) {
+  let best = 0;
+  function height(node) {
+    if (node === null) return 0;
+    const [, left, right] = node;
+    const lh = height(left);
+    const rh = height(right);
+    best = Math.max(best, lh + rh);
+    return 1 + Math.max(lh, rh);
+  }
+  height(root);
+  return best;
+}`,
+      python: `def diameter_of_binary_tree(root):
+    best = 0
+
+    def height(node):
+        nonlocal best
+        if node is None:
+            return 0
+        _, left, right = node
+        lh = height(left)
+        rh = height(right)
+        best = max(best, lh + rh)
+        return 1 + max(lh, rh)
+
+    height(root)
+    return best`,
+      go: `func diameterOfBinaryTree(root *TreeNode) int {
+	best := 0
+	var height func(node *TreeNode) int
+	height = func(node *TreeNode) int {
+		if node == nil {
+			return 0
+		}
+		lh := height(node.Left)
+		rh := height(node.Right)
+		if lh+rh > best {
+			best = lh + rh
+		}
+		if lh > rh {
+			return 1 + lh
+		}
+		return 1 + rh
+	}
+	height(root)
+	return best
+}`,
+    },
+    tests: [
+      {
+        input: [[1, [2, [4, null, null], [5, null, null]], [3, null, null]]],
+        expected: 3,
+      },
+      { input: [[1, [2, null, null], null]], expected: 1 },
+    ],
+    goHarness: diameterGoHarness,
+    complexity: { time: "O(n)", space: "O(h), h = tree height" },
+    explanation:
+      "This is the same height-finding DFS as max depth, with one addition: before returning a node's height upward, we check whether its left height plus its right height beats the best path length seen anywhere so far, and save it if it does. The actual return value going up is still just a height, but the side calculation at every node is what finds the true longest path, even one that does not pass through the root.",
+  },
+  {
+    slug: "word-ladder",
+    title: "Word Ladder",
+    topic: "Graphs",
+    difficulty: "Hard",
+    pattern: "BFS over words that differ by one letter",
+    tags: ["aws"],
+    patternKey: "bfs",
+    prompt:
+      "You get a start word, an end word, and a list of allowed words. In one step you can change exactly one letter of the current word, as long as the result is in the allowed list. Return the number of words in the shortest chain from start to end, including both ends. Return 0 if no chain exists.",
+    fnName: "ladderLength",
+    starter: {
+      javascript: `function ladderLength(beginWord, endWord, wordList) {
+  // write your code here
+}`,
+      python: `def ladder_length(begin_word, end_word, word_list):
+    # write your code here
+    pass`,
+      go: `func ladderLength(beginWord string, endWord string, wordList []string) int {
+	// write your code here
+	return 0
+}`,
+    },
+    solution: {
+      javascript: `function ladderLength(beginWord, endWord, wordList) {
+  const wordSet = new Set(wordList);
+  if (!wordSet.has(endWord)) return 0;
+  const visited = new Set([beginWord]);
+  const queue = [[beginWord, 1]];
+  let head = 0;
+  while (head < queue.length) {
+    const [word, steps] = queue[head++];
+    if (word === endWord) return steps;
+    for (let i = 0; i < word.length; i++) {
+      for (let c = 97; c <= 122; c++) {
+        const ch = String.fromCharCode(c);
+        if (ch === word[i]) continue;
+        const next = word.slice(0, i) + ch + word.slice(i + 1);
+        if (wordSet.has(next) && !visited.has(next)) {
+          visited.add(next);
+          queue.push([next, steps + 1]);
+        }
+      }
+    }
+  }
+  return 0;
+}`,
+      python: `def ladder_length(begin_word, end_word, word_list):
+    word_set = set(word_list)
+    if end_word not in word_set:
+        return 0
+    visited = {begin_word}
+    queue = [(begin_word, 1)]
+    head = 0
+    while head < len(queue):
+        word, steps = queue[head]
+        head += 1
+        if word == end_word:
+            return steps
+        for i in range(len(word)):
+            for c in range(97, 123):
+                ch = chr(c)
+                if ch == word[i]:
+                    continue
+                nxt = word[:i] + ch + word[i + 1:]
+                if nxt in word_set and nxt not in visited:
+                    visited.add(nxt)
+                    queue.append((nxt, steps + 1))
+    return 0`,
+      go: `func ladderLength(beginWord string, endWord string, wordList []string) int {
+	wordSet := map[string]bool{}
+	for _, w := range wordList {
+		wordSet[w] = true
+	}
+	if !wordSet[endWord] {
+		return 0
+	}
+	type item struct {
+		word  string
+		steps int
+	}
+	visited := map[string]bool{beginWord: true}
+	queue := []item{{beginWord, 1}}
+	head := 0
+	for head < len(queue) {
+		cur := queue[head]
+		head++
+		if cur.word == endWord {
+			return cur.steps
+		}
+		wordBytes := []byte(cur.word)
+		for i := 0; i < len(wordBytes); i++ {
+			original := wordBytes[i]
+			for c := byte('a'); c <= 'z'; c++ {
+				if c == original {
+					continue
+				}
+				wordBytes[i] = c
+				next := string(wordBytes)
+				if wordSet[next] && !visited[next] {
+					visited[next] = true
+					queue = append(queue, item{next, cur.steps + 1})
+				}
+			}
+			wordBytes[i] = original
+		}
+	}
+	return 0
+}`,
+    },
+    tests: [
+      {
+        input: ["hit", "cog", ["hot", "dot", "dog", "lot", "log", "cog"]],
+        expected: 5,
+      },
+      {
+        input: ["hit", "cog", ["hot", "dot", "dog", "lot", "log"]],
+        expected: 0,
+      },
+    ],
+    goHarness: wordLadderGoHarness,
+    complexity: { time: "O(n x 26 x wordLength)", space: "O(n)" },
+    explanation:
+      "We treat every allowed word as a node and explore outward in rings, same as any shortest-path BFS: everything reachable in one step first, then two steps, and so on. The twist is how we find neighbors — instead of looking up a stored adjacency list, we build them on the fly by trying every possible single-letter change to the current word and keeping the ones that are allowed words we have not used yet. Because BFS always finishes a ring before starting the next, the first time we reach the end word is guaranteed to be the shortest chain.",
+  },
+  {
+    slug: "number-of-provinces",
+    title: "Number of Provinces",
+    topic: "Graphs",
+    difficulty: "Medium",
+    pattern: "DFS over an adjacency matrix instead of a grid",
+    tags: ["aws"],
+    patternKey: "dfs-flood-fill",
+    prompt:
+      "You get an n x n matrix where matrix[i][j] is 1 if city i and city j are directly connected, and 0 otherwise. A province is a group of cities connected directly or indirectly. Return the number of provinces.",
+    fnName: "findCircleNum",
+    starter: {
+      javascript: `function findCircleNum(isConnected) {
+  // write your code here
+}`,
+      python: `def find_circle_num(is_connected):
+    # write your code here
+    pass`,
+      go: `func findCircleNum(isConnected [][]int) int {
+	// write your code here
+	return 0
+}`,
+    },
+    solution: {
+      javascript: `function findCircleNum(isConnected) {
+  const n = isConnected.length;
+  const visited = new Array(n).fill(false);
+  function dfs(i) {
+    visited[i] = true;
+    for (let j = 0; j < n; j++) {
+      if (isConnected[i][j] === 1 && !visited[j]) dfs(j);
+    }
+  }
+  let provinces = 0;
+  for (let i = 0; i < n; i++) {
+    if (!visited[i]) {
+      provinces++;
+      dfs(i);
+    }
+  }
+  return provinces;
+}`,
+      python: `def find_circle_num(is_connected):
+    n = len(is_connected)
+    visited = [False] * n
+
+    def dfs(i):
+        visited[i] = True
+        for j in range(n):
+            if is_connected[i][j] == 1 and not visited[j]:
+                dfs(j)
+
+    provinces = 0
+    for i in range(n):
+        if not visited[i]:
+            provinces += 1
+            dfs(i)
+    return provinces`,
+      go: `func findCircleNum(isConnected [][]int) int {
+	n := len(isConnected)
+	visited := make([]bool, n)
+	var dfs func(i int)
+	dfs = func(i int) {
+		visited[i] = true
+		for j := 0; j < n; j++ {
+			if isConnected[i][j] == 1 && !visited[j] {
+				dfs(j)
+			}
+		}
+	}
+	provinces := 0
+	for i := 0; i < n; i++ {
+		if !visited[i] {
+			provinces++
+			dfs(i)
+		}
+	}
+	return provinces
+}`,
+    },
+    tests: [
+      {
+        input: [
+          [
+            [1, 1, 0],
+            [1, 1, 0],
+            [0, 0, 1],
+          ],
+        ],
+        expected: 2,
+      },
+      {
+        input: [
+          [
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+          ],
+        ],
+        expected: 3,
+      },
+    ],
+    goHarness: findCircleNumGoHarness,
+    complexity: { time: "O(n^2)", space: "O(n)" },
+    explanation:
+      "This is the exact same flood-fill shape as counting islands, just pointed at a different kind of neighbor. On a grid, 'neighbor' means up, down, left or right. Here, 'neighbor' means any city j where the matrix says city i and city j are connected. We scan every city, and whenever we find one we have not visited yet, we count a new province and flood-fill out to every city reachable from it, marking them visited so they are never counted again.",
+  },
+  {
+    slug: "rotten-oranges",
+    title: "Rotten Oranges",
+    topic: "Graphs",
+    difficulty: "Medium",
+    pattern: "Multi-source BFS, one ring = one minute",
+    tags: ["aws"],
+    patternKey: "bfs",
+    prompt:
+      "You get a grid where 0 is an empty cell, 1 is a fresh orange, and 2 is a rotten orange. Every minute, a rotten orange rots every fresh orange directly next to it. Return the number of minutes until no fresh orange remains, or -1 if that is impossible.",
+    fnName: "orangesRotting",
+    starter: {
+      javascript: `function orangesRotting(grid) {
+  // write your code here
+}`,
+      python: `def oranges_rotting(grid):
+    # write your code here
+    pass`,
+      go: `func orangesRotting(grid [][]int) int {
+	// write your code here
+	return -1
+}`,
+    },
+    solution: {
+      javascript: `function orangesRotting(grid) {
+  const rows = grid.length, cols = grid[0].length;
+  let fresh = 0;
+  let queue = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (grid[r][c] === 1) fresh++;
+      if (grid[r][c] === 2) queue.push([r, c]);
+    }
+  }
+  const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  let minutes = 0;
+  while (queue.length > 0 && fresh > 0) {
+    const next = [];
+    for (const [r, c] of queue) {
+      for (const [dr, dc] of dirs) {
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nc >= 0 && nr < rows && nc < cols && grid[nr][nc] === 1) {
+          grid[nr][nc] = 2;
+          fresh--;
+          next.push([nr, nc]);
+        }
+      }
+    }
+    queue = next;
+    minutes++;
+  }
+  return fresh === 0 ? minutes : -1;
+}`,
+      python: `def oranges_rotting(grid):
+    rows, cols = len(grid), len(grid[0])
+    fresh = 0
+    queue = []
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == 1:
+                fresh += 1
+            if grid[r][c] == 2:
+                queue.append((r, c))
+    dirs = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    minutes = 0
+    while queue and fresh > 0:
+        nxt = []
+        for r, c in queue:
+            for dr, dc in dirs:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 1:
+                    grid[nr][nc] = 2
+                    fresh -= 1
+                    nxt.append((nr, nc))
+        queue = nxt
+        minutes += 1
+    return minutes if fresh == 0 else -1`,
+      go: `func orangesRotting(grid [][]int) int {
+	rows, cols := len(grid), len(grid[0])
+	fresh := 0
+	type cell struct{ r, c int }
+	queue := []cell{}
+	for r := 0; r < rows; r++ {
+		for c := 0; c < cols; c++ {
+			if grid[r][c] == 1 {
+				fresh++
+			}
+			if grid[r][c] == 2 {
+				queue = append(queue, cell{r, c})
+			}
+		}
+	}
+	dirs := [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+	minutes := 0
+	for len(queue) > 0 && fresh > 0 {
+		next := []cell{}
+		for _, cur := range queue {
+			for _, d := range dirs {
+				nr, nc := cur.r+d[0], cur.c+d[1]
+				if nr >= 0 && nc >= 0 && nr < rows && nc < cols && grid[nr][nc] == 1 {
+					grid[nr][nc] = 2
+					fresh--
+					next = append(next, cell{nr, nc})
+				}
+			}
+		}
+		queue = next
+		minutes++
+	}
+	if fresh == 0 {
+		return minutes
+	}
+	return -1
+}`,
+    },
+    tests: [
+      {
+        input: [
+          [
+            [2, 1, 1],
+            [1, 1, 0],
+            [0, 1, 1],
+          ],
+        ],
+        expected: 4,
+      },
+      {
+        input: [
+          [
+            [2, 1, 1],
+            [0, 1, 1],
+            [1, 0, 1],
+          ],
+        ],
+        expected: -1,
+      },
+    ],
+    goHarness: orangesRottingGoHarness,
+    complexity: { time: "O(rows x cols)", space: "O(rows x cols)" },
+    explanation:
+      "This is the same ring-by-ring BFS as a shortest path, except we start from every rotten orange at once instead of just one point, which is why it is called multi-source BFS. Every orange already rotten at minute zero goes into the waiting line together. Each round, we rot every fresh orange next to something currently in the line, collect those newly rotten oranges as the next round, and count the round as one minute. If fresh oranges are still left once the waiting line runs dry, some of them were unreachable.",
+  },
+  {
+    slug: "lru-cache",
+    title: "LRU Cache",
+    topic: "Design",
+    difficulty: "Hard",
+    pattern: "Hash map + ordered structure for O(1) access and eviction",
+    tags: ["aws"],
+    patternKey: "lru-design",
+    prompt:
+      "Design a cache with a fixed capacity that supports put(key, value) and get(key) in O(1) time. When the cache is full, putting a new key must evict the least recently used one. You are given a capacity and a list of operations like [\"put\", 1, 1] or [\"get\", 1]. Return the results of the get operations, in order (-1 for a missing key).",
+    fnName: "lruCache",
+    starter: {
+      javascript: `function lruCache(capacity, operations) {
+  // operations is a list like [["put", 1, 1], ["get", 1], ...]
+  // return an array of the results of every "get" op, in order
+  // write your code here
+}`,
+      python: `def lru_cache(capacity, operations):
+    # operations is a list like [["put", 1, 1], ["get", 1], ...]
+    # return a list of the results of every "get" op, in order
+    # write your code here
+    pass`,
+      go: `func lruCache(capacity int, ops []Op) []int {
+	// write your code here
+	return []int{}
+}`,
+    },
+    solution: {
+      javascript: `function lruCache(capacity, operations) {
+  const map = new Map();
+  const results = [];
+  for (const op of operations) {
+    const [name, a, b] = op;
+    if (name === "put") {
+      if (map.has(a)) map.delete(a);
+      map.set(a, b);
+      if (map.size > capacity) {
+        const oldestKey = map.keys().next().value;
+        map.delete(oldestKey);
+      }
+    } else if (name === "get") {
+      if (!map.has(a)) {
+        results.push(-1);
+        continue;
+      }
+      const val = map.get(a);
+      map.delete(a);
+      map.set(a, val);
+      results.push(val);
+    }
+  }
+  return results;
+}`,
+      python: `from collections import OrderedDict
+
+
+def lru_cache(capacity, operations):
+    cache = OrderedDict()
+    results = []
+    for op in operations:
+        name = op[0]
+        if name == "put":
+            key, val = op[1], op[2]
+            if key in cache:
+                del cache[key]
+            cache[key] = val
+            if len(cache) > capacity:
+                cache.popitem(last=False)
+        elif name == "get":
+            key = op[1]
+            if key not in cache:
+                results.append(-1)
+                continue
+            val = cache.pop(key)
+            cache[key] = val
+            results.append(val)
+    return results`,
+      go: `func lruCache(capacity int, ops []Op) []int {
+	type entry struct{ key, val int }
+	cache := map[int]*list.Element{}
+	order := list.New()
+	results := []int{}
+	for _, op := range ops {
+		if op.Name == "put" {
+			if el, ok := cache[op.A]; ok {
+				order.MoveToFront(el)
+				el.Value = entry{op.A, op.B}
+			} else {
+				el := order.PushFront(entry{op.A, op.B})
+				cache[op.A] = el
+				if order.Len() > capacity {
+					back := order.Back()
+					order.Remove(back)
+					delete(cache, back.Value.(entry).key)
+				}
+			}
+		} else if op.Name == "get" {
+			el, ok := cache[op.A]
+			if !ok {
+				results = append(results, -1)
+				continue
+			}
+			order.MoveToFront(el)
+			results = append(results, el.Value.(entry).val)
+		}
+	}
+	return results
+}`,
+    },
+    tests: [
+      {
+        input: [
+          2,
+          [
+            ["put", 1, 1],
+            ["put", 2, 2],
+            ["get", 1],
+            ["put", 3, 3],
+            ["get", 2],
+            ["put", 4, 4],
+            ["get", 1],
+            ["get", 3],
+            ["get", 4],
+          ],
+        ],
+        expected: [1, -1, -1, 3, 4],
+      },
+    ],
+    goHarness: lruCacheGoHarness,
+    complexity: { time: "O(1) per operation", space: "O(capacity)" },
+    explanation:
+      "We need two things at once: instant lookup by key, and a clear sense of which key was used least recently. A hash map alone gives fast lookup but no sense of order. An ordered structure alone gives order but slow lookup. So we combine them: the hash map points straight at an entry in an ordered list, and every time a key is used, we move its entry to the front of that list. The key sitting at the back of the list is always the least recently used one, so when we are full and need to evict, we remove whatever is at the back.",
+  },
+  {
+    slug: "kth-largest-element",
+    title: "Kth Largest Element in an Array",
+    topic: "Heap / Top-K",
+    difficulty: "Medium",
+    pattern: "Min-heap of size k",
+    tags: ["aws"],
+    patternKey: "heap-topk",
+    prompt:
+      "You get a list of numbers and a number k. Return the kth largest value in the list (not the kth distinct value — duplicates count separately).",
+    fnName: "findKthLargest",
+    starter: {
+      javascript: `function findKthLargest(nums, k) {
+  // write your code here
+}`,
+      python: `def find_kth_largest(nums, k):
+    # write your code here
+    pass`,
+      go: `func findKthLargest(nums []int, k int) int {
+	// write your code here
+	return 0
+}`,
+    },
+    solution: {
+      javascript: `function findKthLargest(nums, k) {
+  const heap = [];
+  function siftUp(i) {
+    while (i > 0) {
+      const parent = (i - 1) >> 1;
+      if (heap[parent] <= heap[i]) break;
+      [heap[parent], heap[i]] = [heap[i], heap[parent]];
+      i = parent;
+    }
+  }
+  function siftDown(i) {
+    const n = heap.length;
+    while (true) {
+      let smallest = i, l = 2 * i + 1, r = 2 * i + 2;
+      if (l < n && heap[l] < heap[smallest]) smallest = l;
+      if (r < n && heap[r] < heap[smallest]) smallest = r;
+      if (smallest === i) break;
+      [heap[i], heap[smallest]] = [heap[smallest], heap[i]];
+      i = smallest;
+    }
+  }
+  for (const num of nums) {
+    if (heap.length < k) {
+      heap.push(num);
+      siftUp(heap.length - 1);
+    } else if (num > heap[0]) {
+      heap[0] = num;
+      siftDown(0);
+    }
+  }
+  return heap[0];
+}`,
+      python: `import heapq
+
+
+def find_kth_largest(nums, k):
+    heap = []
+    for num in nums:
+        heapq.heappush(heap, num)
+        if len(heap) > k:
+            heapq.heappop(heap)
+    return heap[0]`,
+      go: `func findKthLargest(nums []int, k int) int {
+	heap := []int{}
+	siftUp := func(i int) {
+		for i > 0 {
+			parent := (i - 1) / 2
+			if heap[parent] <= heap[i] {
+				break
+			}
+			heap[parent], heap[i] = heap[i], heap[parent]
+			i = parent
+		}
+	}
+	siftDown := func(i int) {
+		n := len(heap)
+		for {
+			smallest := i
+			l, r := 2*i+1, 2*i+2
+			if l < n && heap[l] < heap[smallest] {
+				smallest = l
+			}
+			if r < n && heap[r] < heap[smallest] {
+				smallest = r
+			}
+			if smallest == i {
+				break
+			}
+			heap[i], heap[smallest] = heap[smallest], heap[i]
+			i = smallest
+		}
+	}
+	for _, num := range nums {
+		if len(heap) < k {
+			heap = append(heap, num)
+			siftUp(len(heap) - 1)
+		} else if num > heap[0] {
+			heap[0] = num
+			siftDown(0)
+		}
+	}
+	return heap[0]
+}`,
+    },
+    tests: [
+      { input: [[3, 2, 1, 5, 6, 4], 2], expected: 5 },
+      { input: [[3, 2, 3, 1, 2, 4, 5, 5, 6], 4], expected: 4 },
+    ],
+    goHarness: kthLargestGoHarness,
+    complexity: { time: "O(n log k)", space: "O(k)" },
+    explanation:
+      "We keep a small pile of exactly k numbers, arranged so the smallest one in the pile is always easy to find and remove — that arrangement is called a min-heap. We go through the list once: if the pile has room, a number just joins it; once the pile is full, a new number only gets in if it beats the smallest number currently in the pile, which then gets kicked out. After looking at every number, the smallest number left in the pile of k is exactly the kth largest overall, since the k biggest numbers are the only ones that ever survived in the pile.",
+  },
 ];
 
 export function getProblem(slug: string): Problem | undefined {
   return PROBLEMS.find((p) => p.slug === slug);
+}
+
+export const AWS_FAVORITES_SLUG = "aws-favorites";
+
+export function slugifyTopic(topic: string): string {
+  return topic
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+export interface TopicSummary {
+  slug: string;
+  label: string;
+  count: number;
+}
+
+// Returns every real topic plus a synthetic "AWS Favorites" bucket (tag-based,
+// can overlap with real topics) for the topic-select screen.
+export function getTopicList(): TopicSummary[] {
+  const counts = new Map<string, number>();
+  for (const p of PROBLEMS) {
+    counts.set(p.topic, (counts.get(p.topic) || 0) + 1);
+  }
+  const topics: TopicSummary[] = Array.from(counts.entries()).map(([topic, count]) => ({
+    slug: slugifyTopic(topic),
+    label: topic,
+    count,
+  }));
+  const awsCount = PROBLEMS.filter((p) => p.tags?.includes("aws")).length;
+  return [
+    { slug: AWS_FAVORITES_SLUG, label: "AWS Interview Favorites", count: awsCount },
+    ...topics,
+  ];
+}
+
+export function getProblemsByTopicSlug(slug: string): Problem[] {
+  if (slug === AWS_FAVORITES_SLUG) {
+    return PROBLEMS.filter((p) => p.tags?.includes("aws"));
+  }
+  return PROBLEMS.filter((p) => slugifyTopic(p.topic) === slug);
+}
+
+export function getTopicLabel(slug: string): string {
+  if (slug === AWS_FAVORITES_SLUG) return "AWS Interview Favorites";
+  const found = PROBLEMS.find((p) => slugifyTopic(p.topic) === slug);
+  return found ? found.topic : slug;
 }

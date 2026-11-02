@@ -47,8 +47,14 @@ print("__RESULTS__" + json.dumps(__results))
 }
 
 function pyFnName(problem: Problem): string {
-  // convert camelCase fnName to snake_case, matching the starter/solution code convention
-  return problem.fnName.replace(/([A-Z])/g, "_$1").toLowerCase();
+  // convert camelCase fnName to snake_case, matching the starter/solution code convention.
+  // Two-pass splitter: first break lowercase->uppercase boundaries ("topK" -> "top_K"),
+  // then break a run of caps followed by a new lowercase word ("KFrequent" -> "K_Frequent",
+  // but "BST" at the end of "isValidBST" has no trailing lowercase so it stays joined).
+  return problem.fnName
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1_$2")
+    .toLowerCase();
 }
 
 export interface RunResult {

@@ -1,15 +1,31 @@
 # CODE ARCADE
 
-A personal, arcade-styled LeetCode/NeetCode-style practice site. Ten problems,
-one per core pattern (hashing, sliding window, two pointers, binary search,
-intervals/greedy, stacks, graphs, DP, backtracking). The idea is repetition,
-not volume — solve the same scenario until the pattern is automatic. Every
-solve is counted and turns into XP/levels.
+A personal, arcade-styled LeetCode/NeetCode-style practice site. 30 problems
+across 14 core patterns (hashing, sliding window, two pointers, binary
+search, intervals/greedy, stacks, linked lists, trees, graphs, DP,
+backtracking, heaps, LRU design). The idea is repetition, not volume — solve
+the same scenario until the pattern is automatic. Every solve is counted and
+turns into XP/levels.
 
 Write code in **JavaScript, Python, or Go**, run it for real against test
 cases, and see pass/fail output in an in-page console. Reveal the solution
 any time to see the time/space complexity plus a plain, child-level
 explanation (no analogies) and the annotated reference code.
+
+## Browsing
+
+- The home page is a **topic picker** — click a topic to see just that
+  topic's problems. One of the "topics" is **⭐ AWS Interview Favorites**: a
+  tag-based bucket (`tags: ["aws"]` in `lib/problems.ts`) pulling together
+  the problems most likely to come up in an AWS interview — heavy on trees
+  and graphs, plus twisted variants of common ones (right-side view instead
+  of plain depth, invert instead of just traverse, etc.), per interview
+  feedback, alongside AWS staples like LRU Cache and Kth Largest Element.
+- **`/cheatsheet`** is a single page listing the ~14 underlying patterns,
+  each with one canonical code block, plus a one-line note per problem on
+  exactly what was tweaked to turn that base pattern into that specific
+  problem. Built for memorizing the shape instead of grinding every problem
+  individually — see `lib/cheatsheet.ts`.
 
 ## How it works
 

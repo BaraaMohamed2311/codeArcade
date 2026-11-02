@@ -2,23 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { PROBLEMS } from "../lib/problems";
-import { getAllProgress, totalSolves, xpForSolves, levelFromXp, ProgressEntry } from "../lib/progress";
+import { getTopicList, AWS_FAVORITES_SLUG } from "../lib/problems";
+import { totalSolves, xpForSolves, levelFromXp } from "../lib/progress";
 import { sfx } from "../lib/sound";
 
 export default function Home() {
-  const [progress, setProgress] = useState<Record<string, ProgressEntry>>({});
   const [xp, setXp] = useState(0);
   const [email, setEmail] = useState("");
   const [subStatus, setSubStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    setProgress(getAllProgress());
     setXp(xpForSolves(totalSolves()));
   }, []);
 
   const { level, into, need } = levelFromXp(xp);
   const pct = Math.min(100, Math.round((into / need) * 100));
+  const topics = getTopicList();
 
   async function subscribe(e: React.FormEvent) {
     e.preventDefault();
@@ -62,27 +61,29 @@ export default function Home() {
       <section className="hero">
         <h1>GRIND THE PATTERNS,<br />NOT THE PILE</h1>
         <p>
-          A small set of problems, one per pattern. Replay them until the pattern is wired into
-          your head. Every language runs for real. Every solve counts.
+          Pick a topic. Replay its handful of problems until the pattern is wired into your
+          head. Every language runs for real. Every solve is counted.
         </p>
       </section>
 
+      <div className="nav-links" style={{ marginBottom: 24, justifyContent: "center" }}>
+        <Link href="/cheatsheet" className="nav-link" onClick={() => sfx.click()}>
+          📋 PATTERN CHEAT SHEET
+        </Link>
+      </div>
+
       <div className="grid">
-        {PROBLEMS.map((p) => {
-          const entry = progress[p.slug];
-          return (
-            <Link href={`/problem/${p.slug}`} key={p.slug} className="card" onClick={() => sfx.click()}>
-              <span className="topic">{p.topic}</span>
-              <h3>{p.title}</h3>
-              <div className="badge-row">
-                <span className={`badge ${p.difficulty}`}>{p.difficulty}</span>
-                <span className="solve-count">
-                  ★ {entry?.solved ?? 0}×
-                </span>
-              </div>
-            </Link>
-          );
-        })}
+        {topics.map((t) => (
+          <Link
+            href={`/topic/${t.slug}`}
+            key={t.slug}
+            className={`topic-card ${t.slug === AWS_FAVORITES_SLUG ? "aws" : ""}`}
+            onClick={() => sfx.click()}
+          >
+            <h3>{t.slug === AWS_FAVORITES_SLUG ? "⭐ " : ""}{t.label}</h3>
+            <span className="count">{t.count} problem{t.count === 1 ? "" : "s"}</span>
+          </Link>
+        ))}
       </div>
 
       <h2 className="section-title">DAILY REMINDER</h2>

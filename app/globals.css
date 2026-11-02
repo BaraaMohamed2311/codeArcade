@@ -164,6 +164,134 @@ a {
 .badge.Medium { background: rgba(255, 226, 89, 0.15); color: var(--neon-yellow); border: 1px solid var(--neon-yellow); }
 .badge.Hard { background: rgba(255, 77, 77, 0.15); color: var(--neon-red); border: 1px solid var(--neon-red); }
 
+.badge.aws-badge {
+  background: rgba(255, 153, 0, 0.15);
+  color: #ff9900;
+  border: 1px solid #ff9900;
+}
+
+.topic-card {
+  background: linear-gradient(160deg, var(--panel), #0d0b22);
+  border: 2px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 22px 18px;
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+
+.topic-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--neon-pink);
+  box-shadow: 0 8px 24px rgba(255, 45, 149, 0.18);
+}
+
+.topic-card.aws {
+  border-color: #ff9900;
+  background: linear-gradient(160deg, #2a1f0d, #120f24);
+}
+
+.topic-card.aws:hover {
+  border-color: #ffb733;
+  box-shadow: 0 8px 24px rgba(255, 153, 0, 0.25);
+}
+
+.topic-card h3 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.topic-card .count {
+  font-size: 18px;
+  color: var(--text-dim);
+}
+
+.nav-links {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  font-size: 18px;
+  color: var(--neon-yellow);
+  text-decoration: none;
+  border: 1px solid var(--neon-yellow);
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.nav-link:hover {
+  background: rgba(255, 226, 89, 0.12);
+}
+
+.pattern-block {
+  border: 2px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 24px;
+  background: linear-gradient(160deg, var(--panel), #0d0b22);
+}
+
+.pattern-block h2 {
+  font-size: 16px;
+  color: var(--neon-cyan);
+  margin: 0 0 6px;
+}
+
+.pattern-block .pattern-desc {
+  color: var(--text-dim);
+  font-size: 18px;
+  margin: 0 0 14px;
+}
+
+.pattern-code {
+  background: #06040f;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 14px;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 14px;
+}
+
+.tweak-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 17px;
+}
+
+.tweak-table th {
+  text-align: left;
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  color: var(--neon-yellow);
+  padding: 6px 8px;
+  border-bottom: 2px solid var(--panel-border);
+}
+
+.tweak-table td {
+  padding: 8px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  vertical-align: top;
+}
+
+.tweak-table a {
+  color: var(--neon-cyan);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tweak-table a:hover {
+  text-decoration: underline;
+}
+
 .solve-count {
   margin-left: auto;
   color: var(--neon-yellow);
