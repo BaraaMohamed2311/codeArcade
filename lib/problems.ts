@@ -1172,6 +1172,95 @@ func main() {
 }
 `;
 
+<<<<<<< HEAD
+=======
+const goTreeHelpers = `func n(v int, l, r *TreeNode) *TreeNode { return &TreeNode{Val: v, Left: l, Right: r} }`;
+
+const goMiniMain = (body: string) => `package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+${treeGoPrelude}
+
+${goTreeHelpers}
+
+CODE_PLACEHOLDER
+
+func main() {
+	results := []map[string]interface{}{}
+${body}
+	b, _ := json.Marshal(results)
+	fmt.Println("__RESULTS__" + string(b))
+}
+`;
+
+const symmetricTreeGoHarness = (code: string) =>
+  goMiniMain(`	o1 := isSymmetric(n(1, n(2, n(3, nil, nil), n(4, nil, nil)), n(2, n(4, nil, nil), n(3, nil, nil))))
+	results = append(results, map[string]interface{}{"pass": o1 == true, "output": o1})
+	o2 := isSymmetric(n(1, n(2, nil, n(3, nil, nil)), n(2, nil, n(3, nil, nil))))
+	results = append(results, map[string]interface{}{"pass": o2 == false, "output": o2})`).replace(
+    "CODE_PLACEHOLDER",
+    code
+  );
+
+const lcaGoHarness = (code: string) =>
+  goMiniMain(`	t := n(3, n(5, n(6, nil, nil), n(2, n(7, nil, nil), n(4, nil, nil))), n(1, n(0, nil, nil), n(8, nil, nil)))
+	o1 := lowestCommonAncestor(t, 5, 1)
+	results = append(results, map[string]interface{}{"pass": o1 == 3, "output": o1})
+	o2 := lowestCommonAncestor(t, 5, 4)
+	results = append(results, map[string]interface{}{"pass": o2 == 5, "output": o2})
+	o3 := lowestCommonAncestor(t, 6, 4)
+	results = append(results, map[string]interface{}{"pass": o3 == 5, "output": o3})`).replace(
+    "CODE_PLACEHOLDER",
+    code
+  );
+
+const balancedTreeGoHarness = (code: string) =>
+  goMiniMain(`	o1 := isBalanced(n(3, n(9, nil, nil), n(20, n(15, nil, nil), n(7, nil, nil))))
+	results = append(results, map[string]interface{}{"pass": o1 == true, "output": o1})
+	o2 := isBalanced(n(1, n(2, n(3, n(4, nil, nil), nil), nil), nil))
+	results = append(results, map[string]interface{}{"pass": o2 == false, "output": o2})`).replace(
+    "CODE_PLACEHOLDER",
+    code
+  );
+
+const validTreeGoHarness = (code: string) =>
+  goMiniMain(`	o1 := validTree(5, [][]int{{0, 1}, {0, 2}, {0, 3}, {1, 4}})
+	results = append(results, map[string]interface{}{"pass": o1 == true, "output": o1})
+	o2 := validTree(5, [][]int{{0, 1}, {1, 2}, {2, 3}, {1, 3}, {1, 4}})
+	results = append(results, map[string]interface{}{"pass": o2 == false, "output": o2})
+	o3 := validTree(4, [][]int{{0, 1}, {2, 3}})
+	results = append(results, map[string]interface{}{"pass": o3 == false, "output": o3})`).replace(
+    "CODE_PLACEHOLDER",
+    code
+  );
+
+const surroundedGoHarness = (code: string) =>
+  goMiniMain(`	b1 := [][]string{{"X", "X", "X", "X"}, {"X", "O", "O", "X"}, {"X", "X", "O", "X"}, {"X", "O", "X", "X"}}
+	w1 := [][]string{{"X", "X", "X", "X"}, {"X", "X", "X", "X"}, {"X", "X", "X", "X"}, {"X", "O", "X", "X"}}
+	o1 := solve(b1)
+	results = append(results, map[string]interface{}{"pass": fmt.Sprint(o1) == fmt.Sprint(w1), "output": o1})
+	b2 := [][]string{{"O"}}
+	o2 := solve(b2)
+	results = append(results, map[string]interface{}{"pass": fmt.Sprint(o2) == fmt.Sprint([][]string{{"O"}}), "output": o2})`).replace(
+    "CODE_PLACEHOLDER",
+    code
+  );
+
+const pacificAtlanticGoHarness = (code: string) =>
+  goMiniMain(`	o1 := pacificAtlantic([][]int{{1, 2, 2, 3, 5}, {3, 2, 3, 4, 4}, {2, 4, 5, 3, 1}, {6, 7, 1, 4, 5}, {5, 1, 1, 2, 4}})
+	w1 := [][]int{{0, 4}, {1, 3}, {1, 4}, {2, 2}, {3, 0}, {3, 1}, {4, 0}}
+	results = append(results, map[string]interface{}{"pass": fmt.Sprint(o1) == fmt.Sprint(w1), "output": o1})
+	o2 := pacificAtlantic([][]int{{1}})
+	results = append(results, map[string]interface{}{"pass": fmt.Sprint(o2) == fmt.Sprint([][]int{{0, 0}}), "output": o2})`).replace(
+    "CODE_PLACEHOLDER",
+    code
+  );
+
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
 export const PROBLEMS: Problem[] = [
   {
     slug: "two-sum",
@@ -3787,6 +3876,601 @@ def find_kth_largest(nums, k):
     explanation:
       "We keep a small pile of exactly k numbers, arranged so the smallest one in the pile is always easy to find and remove — that arrangement is called a min-heap. We go through the list once: if the pile has room, a number just joins it; once the pile is full, a new number only gets in if it beats the smallest number currently in the pile, which then gets kicked out. After looking at every number, the smallest number left in the pile of k is exactly the kth largest overall, since the k biggest numbers are the only ones that ever survived in the pile.",
   },
+<<<<<<< HEAD
+=======
+  {
+    slug: "symmetric-tree",
+    title: "Symmetric Tree",
+    topic: "Trees",
+    difficulty: "Easy",
+    pattern: "DFS on two nodes at once, mirrored child pairing",
+    tags: ["aws"],
+    patternKey: "tree-dfs",
+    prompt:
+      "You get a binary tree, written as null or [value, leftSubtree, rightSubtree]. Return true if the tree is a mirror image of itself, meaning the left side reads the same as the right side flipped.",
+    fnName: "isSymmetric",
+    starter: {
+      javascript: `function isSymmetric(root) {
+  // root is null, or [value, left, right]
+  // write your code here
+}`,
+      python: `def is_symmetric(root):
+    # root is None, or [value, left, right]
+    # write your code here
+    pass`,
+      go: `func isSymmetric(root *TreeNode) bool {
+	// write your code here
+	return false
+}`,
+    },
+    solution: {
+      javascript: `function isSymmetric(root) {
+  function mirror(a, b) {
+    if (a === null && b === null) return true;
+    if (a === null || b === null) return false;
+    return a[0] === b[0] && mirror(a[1], b[2]) && mirror(a[2], b[1]);
+  }
+  return root === null || mirror(root[1], root[2]);
+}`,
+      python: `def is_symmetric(root):
+    def mirror(a, b):
+        if a is None and b is None:
+            return True
+        if a is None or b is None:
+            return False
+        return a[0] == b[0] and mirror(a[1], b[2]) and mirror(a[2], b[1])
+
+    return root is None or mirror(root[1], root[2])`,
+      go: `func isSymmetric(root *TreeNode) bool {
+	var mirror func(a, b *TreeNode) bool
+	mirror = func(a, b *TreeNode) bool {
+		if a == nil && b == nil {
+			return true
+		}
+		if a == nil || b == nil {
+			return false
+		}
+		return a.Val == b.Val && mirror(a.Left, b.Right) && mirror(a.Right, b.Left)
+	}
+	return root == nil || mirror(root.Left, root.Right)
+}`,
+    },
+    tests: [
+      { input: [[1, [2, [3, null, null], [4, null, null]], [2, [4, null, null], [3, null, null]]]], expected: true },
+      { input: [[1, [2, null, [3, null, null]], [2, null, [3, null, null]]]], expected: false },
+    ],
+    goHarness: symmetricTreeGoHarness,
+    complexity: { time: "O(n)", space: "O(h), h = tree height" },
+    explanation:
+      "Instead of walking one node at a time, we walk two nodes together: one from the left side and one from the matching spot on the right side. If both are empty, that spot matches. If only one is empty, it does not match. Otherwise their values must be equal, and then we compare the left node's left child with the right node's right child, and the left node's right child with the right node's left child. The crossing of the children is the whole twist.",
+  },
+  {
+    slug: "lowest-common-ancestor",
+    title: "Lowest Common Ancestor of a Binary Tree",
+    topic: "Trees",
+    difficulty: "Medium",
+    pattern: "DFS that returns a found-value up the tree",
+    tags: ["aws"],
+    patternKey: "tree-dfs",
+    prompt:
+      "You get a binary tree, written as null or [value, leftSubtree, rightSubtree], with all values different, plus two values p and q that both exist in the tree. Return the value of the lowest node that has both p and q somewhere below it (a node counts as below itself).",
+    fnName: "lowestCommonAncestor",
+    starter: {
+      javascript: `function lowestCommonAncestor(root, p, q) {
+  // root is null, or [value, left, right]
+  // write your code here
+}`,
+      python: `def lowest_common_ancestor(root, p, q):
+    # root is None, or [value, left, right]
+    # write your code here
+    pass`,
+      go: `func lowestCommonAncestor(root *TreeNode, p int, q int) int {
+	// write your code here
+	return 0
+}`,
+    },
+    solution: {
+      javascript: `function lowestCommonAncestor(root, p, q) {
+  function find(node) {
+    if (node === null) return null;
+    if (node[0] === p || node[0] === q) return node;
+    const left = find(node[1]);
+    const right = find(node[2]);
+    if (left !== null && right !== null) return node;
+    return left !== null ? left : right;
+  }
+  return find(root)[0];
+}`,
+      python: `def lowest_common_ancestor(root, p, q):
+    def find(node):
+        if node is None:
+            return None
+        if node[0] == p or node[0] == q:
+            return node
+        left = find(node[1])
+        right = find(node[2])
+        if left is not None and right is not None:
+            return node
+        return left if left is not None else right
+
+    return find(root)[0]`,
+      go: `func lowestCommonAncestor(root *TreeNode, p int, q int) int {
+	var find func(node *TreeNode) *TreeNode
+	find = func(node *TreeNode) *TreeNode {
+		if node == nil {
+			return nil
+		}
+		if node.Val == p || node.Val == q {
+			return node
+		}
+		left := find(node.Left)
+		right := find(node.Right)
+		if left != nil && right != nil {
+			return node
+		}
+		if left != nil {
+			return left
+		}
+		return right
+	}
+	return find(root).Val
+}`,
+    },
+    tests: [
+      { input: [[3, [5, [6, null, null], [2, [7, null, null], [4, null, null]]], [1, [0, null, null], [8, null, null]]], 5, 1], expected: 3 },
+      { input: [[3, [5, [6, null, null], [2, [7, null, null], [4, null, null]]], [1, [0, null, null], [8, null, null]]], 5, 4], expected: 5 },
+      { input: [[3, [5, [6, null, null], [2, [7, null, null], [4, null, null]]], [1, [0, null, null], [8, null, null]]], 6, 4], expected: 5 },
+    ],
+    goHarness: lcaGoHarness,
+    complexity: { time: "O(n)", space: "O(h), h = tree height" },
+    explanation:
+      "We search the tree from the top. Each call returns either nothing, or the first of p or q it ran into below that spot. If a node finds something on its left side and something on its right side, then p and q live on different sides of it, so that node is the answer. If only one side found something, we pass that result upward unchanged. If the node itself is p or q, we stop and return it, because the other one is either below it (so it is the answer) or elsewhere (and gets handled higher up).",
+  },
+  {
+    slug: "balanced-binary-tree",
+    title: "Balanced Binary Tree",
+    topic: "Trees",
+    difficulty: "Easy",
+    pattern: "DFS returning height, with a sentinel for failure",
+    tags: ["aws"],
+    patternKey: "tree-dfs",
+    prompt:
+      "You get a binary tree, written as null or [value, leftSubtree, rightSubtree]. Return true if, for every node, the heights of its left and right sides differ by at most 1.",
+    fnName: "isBalanced",
+    starter: {
+      javascript: `function isBalanced(root) {
+  // root is null, or [value, left, right]
+  // write your code here
+}`,
+      python: `def is_balanced(root):
+    # root is None, or [value, left, right]
+    # write your code here
+    pass`,
+      go: `func isBalanced(root *TreeNode) bool {
+	// write your code here
+	return false
+}`,
+    },
+    solution: {
+      javascript: `function isBalanced(root) {
+  function height(node) {
+    if (node === null) return 0;
+    const l = height(node[1]);
+    if (l === -1) return -1;
+    const r = height(node[2]);
+    if (r === -1) return -1;
+    if (Math.abs(l - r) > 1) return -1;
+    return 1 + Math.max(l, r);
+  }
+  return height(root) !== -1;
+}`,
+      python: `def is_balanced(root):
+    def height(node):
+        if node is None:
+            return 0
+        l = height(node[1])
+        if l == -1:
+            return -1
+        r = height(node[2])
+        if r == -1:
+            return -1
+        if abs(l - r) > 1:
+            return -1
+        return 1 + max(l, r)
+
+    return height(root) != -1`,
+      go: `func isBalanced(root *TreeNode) bool {
+	var height func(node *TreeNode) int
+	height = func(node *TreeNode) int {
+		if node == nil {
+			return 0
+		}
+		l := height(node.Left)
+		if l == -1 {
+			return -1
+		}
+		r := height(node.Right)
+		if r == -1 {
+			return -1
+		}
+		d := l - r
+		if d < 0 {
+			d = -d
+		}
+		if d > 1 {
+			return -1
+		}
+		if l > r {
+			return 1 + l
+		}
+		return 1 + r
+	}
+	return height(root) != -1
+}`,
+    },
+    tests: [
+      { input: [[3, [9, null, null], [20, [15, null, null], [7, null, null]]]], expected: true },
+      { input: [[1, [2, [3, [4, null, null], null], null], null]], expected: false },
+    ],
+    goHarness: balancedTreeGoHarness,
+    complexity: { time: "O(n)", space: "O(h), h = tree height" },
+    explanation:
+      "This is the same height-finding walk as maximum depth, with one extra rule. After getting the heights of the left and right sides, if they differ by more than 1, we return -1 to mean 'this tree is already broken'. Any caller that sees -1 from below passes -1 straight up without doing more work. At the end, a -1 means not balanced and any other number means balanced. Using -1 lets us check everything in one pass instead of recomputing heights again and again.",
+  },
+  {
+    slug: "graph-valid-tree",
+    title: "Graph Valid Tree",
+    topic: "Graphs",
+    difficulty: "Medium",
+    pattern: "Edge count check + DFS connectivity",
+    tags: ["aws"],
+    patternKey: "dfs-flood-fill",
+    prompt:
+      "You get n nodes labeled 0 to n-1 and a list of undirected edges, each written as [a, b]. Return true if these edges connect all n nodes into one tree: everything is reachable from everything else, and there are no cycles.",
+    fnName: "validTree",
+    starter: {
+      javascript: `function validTree(n, edges) {
+  // write your code here
+}`,
+      python: `def valid_tree(n, edges):
+    # write your code here
+    pass`,
+      go: `func validTree(n int, edges [][]int) bool {
+	// write your code here
+	return false
+}`,
+    },
+    solution: {
+      javascript: `function validTree(n, edges) {
+  if (edges.length !== n - 1) return false;
+  const adj = Array.from({ length: n }, () => []);
+  for (const [a, b] of edges) {
+    adj[a].push(b);
+    adj[b].push(a);
+  }
+  const seen = new Set([0]);
+  const stack = [0];
+  while (stack.length) {
+    const cur = stack.pop();
+    for (const next of adj[cur]) {
+      if (!seen.has(next)) {
+        seen.add(next);
+        stack.push(next);
+      }
+    }
+  }
+  return seen.size === n;
+}`,
+      python: `def valid_tree(n, edges):
+    if len(edges) != n - 1:
+        return False
+    adj = [[] for _ in range(n)]
+    for a, b in edges:
+        adj[a].append(b)
+        adj[b].append(a)
+    seen = {0}
+    stack = [0]
+    while stack:
+        cur = stack.pop()
+        for nxt in adj[cur]:
+            if nxt not in seen:
+                seen.add(nxt)
+                stack.append(nxt)
+    return len(seen) == n`,
+      go: `func validTree(n int, edges [][]int) bool {
+	if len(edges) != n-1 {
+		return false
+	}
+	adj := make([][]int, n)
+	for _, e := range edges {
+		adj[e[0]] = append(adj[e[0]], e[1])
+		adj[e[1]] = append(adj[e[1]], e[0])
+	}
+	seen := make([]bool, n)
+	seen[0] = true
+	stack := []int{0}
+	count := 0
+	for len(stack) > 0 {
+		cur := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		count++
+		for _, next := range adj[cur] {
+			if !seen[next] {
+				seen[next] = true
+				stack = append(stack, next)
+			}
+		}
+	}
+	return count == n
+}`,
+    },
+    tests: [
+      { input: [5, [[0, 1], [0, 2], [0, 3], [1, 4]]], expected: true },
+      { input: [5, [[0, 1], [1, 2], [2, 3], [1, 3], [1, 4]]], expected: false },
+      { input: [4, [[0, 1], [2, 3]]], expected: false },
+    ],
+    goHarness: validTreeGoHarness,
+    complexity: { time: "O(n + e)", space: "O(n + e)" },
+    explanation:
+      "A tree with n nodes always has exactly n-1 edges, so if the edge count is anything else we can answer false right away. If the count is right, the only remaining way to fail is if some nodes cannot be reached from node 0. We walk outward from node 0, remembering each node we have visited, and at the end check whether we visited all n. With n-1 edges and everything connected, there is no room left for a cycle.",
+  },
+  {
+    slug: "surrounded-regions",
+    title: "Surrounded Regions",
+    topic: "Graphs",
+    difficulty: "Medium",
+    pattern: "Flood fill from the border inward, then flip the rest",
+    tags: ["aws"],
+    patternKey: "dfs-flood-fill",
+    prompt:
+      "You get a grid of \"X\" and \"O\" strings. Every group of \"O\" cells (connected up, down, left, right) that does not touch the edge of the grid is surrounded, and must be changed to \"X\". Groups of \"O\" that touch the edge stay as they are. Return the changed grid.",
+    fnName: "solve",
+    starter: {
+      javascript: `function solve(board) {
+  // write your code here
+  return board;
+}`,
+      python: `def solve(board):
+    # write your code here
+    return board`,
+      go: `func solve(board [][]string) [][]string {
+	// write your code here
+	return board
+}`,
+    },
+    solution: {
+      javascript: `function solve(board) {
+  const rows = board.length;
+  if (rows === 0) return board;
+  const cols = board[0].length;
+  function mark(r, c) {
+    if (r < 0 || c < 0 || r >= rows || c >= cols || board[r][c] !== "O") return;
+    board[r][c] = "S";
+    mark(r + 1, c);
+    mark(r - 1, c);
+    mark(r, c + 1);
+    mark(r, c - 1);
+  }
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (r === 0 || c === 0 || r === rows - 1 || c === cols - 1) mark(r, c);
+    }
+  }
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (board[r][c] === "O") board[r][c] = "X";
+      else if (board[r][c] === "S") board[r][c] = "O";
+    }
+  }
+  return board;
+}`,
+      python: `def solve(board):
+    rows = len(board)
+    if rows == 0:
+        return board
+    cols = len(board[0])
+
+    def mark(r, c):
+        if r < 0 or c < 0 or r >= rows or c >= cols or board[r][c] != "O":
+            return
+        board[r][c] = "S"
+        mark(r + 1, c)
+        mark(r - 1, c)
+        mark(r, c + 1)
+        mark(r, c - 1)
+
+    for r in range(rows):
+        for c in range(cols):
+            if r == 0 or c == 0 or r == rows - 1 or c == cols - 1:
+                mark(r, c)
+    for r in range(rows):
+        for c in range(cols):
+            if board[r][c] == "O":
+                board[r][c] = "X"
+            elif board[r][c] == "S":
+                board[r][c] = "O"
+    return board`,
+      go: `func solve(board [][]string) [][]string {
+	rows := len(board)
+	if rows == 0 {
+		return board
+	}
+	cols := len(board[0])
+	var mark func(r, c int)
+	mark = func(r, c int) {
+		if r < 0 || c < 0 || r >= rows || c >= cols || board[r][c] != "O" {
+			return
+		}
+		board[r][c] = "S"
+		mark(r+1, c)
+		mark(r-1, c)
+		mark(r, c+1)
+		mark(r, c-1)
+	}
+	for r := 0; r < rows; r++ {
+		for c := 0; c < cols; c++ {
+			if r == 0 || c == 0 || r == rows-1 || c == cols-1 {
+				mark(r, c)
+			}
+		}
+	}
+	for r := 0; r < rows; r++ {
+		for c := 0; c < cols; c++ {
+			if board[r][c] == "O" {
+				board[r][c] = "X"
+			} else if board[r][c] == "S" {
+				board[r][c] = "O"
+			}
+		}
+	}
+	return board
+}`,
+    },
+    tests: [
+      {
+        input: [[["X", "X", "X", "X"], ["X", "O", "O", "X"], ["X", "X", "O", "X"], ["X", "O", "X", "X"]]],
+        expected: [["X", "X", "X", "X"], ["X", "X", "X", "X"], ["X", "X", "X", "X"], ["X", "O", "X", "X"]],
+      },
+      { input: [[["O"]]], expected: [["O"]] },
+    ],
+    goHarness: surroundedGoHarness,
+    complexity: { time: "O(rows * cols)", space: "O(rows * cols) for the recursion" },
+    explanation:
+      "It is hard to ask 'is this group surrounded?' from the inside, so we flip the question around. Any \"O\" that touches the edge, or is connected to one that does, is safe. So we start at every edge cell, and wherever we find an \"O\" we spread out to all connected \"O\" cells and mark them safe with a temporary letter \"S\". After that, every \"O\" still left was never reached from the edge, so it is surrounded and becomes \"X\". Finally we turn the temporary \"S\" cells back into \"O\". This is the same flood fill as counting islands, just started from the border instead of from every cell.",
+  },
+  {
+    slug: "pacific-atlantic",
+    title: "Pacific Atlantic Water Flow",
+    topic: "Graphs",
+    difficulty: "Medium",
+    pattern: "Two flood fills run backwards from the edges",
+    tags: ["aws"],
+    patternKey: "dfs-flood-fill",
+    prompt:
+      "You get a grid of heights. The Pacific Ocean touches the top and left edges, and the Atlantic Ocean touches the bottom and right edges. Water can flow from a cell to a neighbor (up, down, left, right) with equal or lower height. Return every [row, col] cell from which water can reach both oceans, ordered by row then column.",
+    fnName: "pacificAtlantic",
+    starter: {
+      javascript: `function pacificAtlantic(heights) {
+  // write your code here
+}`,
+      python: `def pacific_atlantic(heights):
+    # write your code here
+    pass`,
+      go: `func pacificAtlantic(heights [][]int) [][]int {
+	// write your code here
+	return [][]int{}
+}`,
+    },
+    solution: {
+      javascript: `function pacificAtlantic(heights) {
+  const rows = heights.length;
+  const cols = heights[0].length;
+  const pac = Array.from({ length: rows }, () => Array(cols).fill(false));
+  const atl = Array.from({ length: rows }, () => Array(cols).fill(false));
+  const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  function dfs(r, c, seen) {
+    seen[r][c] = true;
+    for (const [dr, dc] of dirs) {
+      const nr = r + dr;
+      const nc = c + dc;
+      if (nr < 0 || nc < 0 || nr >= rows || nc >= cols) continue;
+      if (seen[nr][nc] || heights[nr][nc] < heights[r][c]) continue;
+      dfs(nr, nc, seen);
+    }
+  }
+  for (let r = 0; r < rows; r++) {
+    dfs(r, 0, pac);
+    dfs(r, cols - 1, atl);
+  }
+  for (let c = 0; c < cols; c++) {
+    dfs(0, c, pac);
+    dfs(rows - 1, c, atl);
+  }
+  const result = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (pac[r][c] && atl[r][c]) result.push([r, c]);
+    }
+  }
+  return result;
+}`,
+      python: `def pacific_atlantic(heights):
+    rows, cols = len(heights), len(heights[0])
+    pac = [[False] * cols for _ in range(rows)]
+    atl = [[False] * cols for _ in range(rows)]
+
+    def dfs(r, c, seen):
+        seen[r][c] = True
+        for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nr, nc = r + dr, c + dc
+            if nr < 0 or nc < 0 or nr >= rows or nc >= cols:
+                continue
+            if seen[nr][nc] or heights[nr][nc] < heights[r][c]:
+                continue
+            dfs(nr, nc, seen)
+
+    for r in range(rows):
+        dfs(r, 0, pac)
+        dfs(r, cols - 1, atl)
+    for c in range(cols):
+        dfs(0, c, pac)
+        dfs(rows - 1, c, atl)
+    return [[r, c] for r in range(rows) for c in range(cols) if pac[r][c] and atl[r][c]]`,
+      go: `func pacificAtlantic(heights [][]int) [][]int {
+	rows, cols := len(heights), len(heights[0])
+	pac := make([][]bool, rows)
+	atl := make([][]bool, rows)
+	for i := range pac {
+		pac[i] = make([]bool, cols)
+		atl[i] = make([]bool, cols)
+	}
+	dirs := [][]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+	var dfs func(r, c int, seen [][]bool)
+	dfs = func(r, c int, seen [][]bool) {
+		seen[r][c] = true
+		for _, d := range dirs {
+			nr, nc := r+d[0], c+d[1]
+			if nr < 0 || nc < 0 || nr >= rows || nc >= cols {
+				continue
+			}
+			if seen[nr][nc] || heights[nr][nc] < heights[r][c] {
+				continue
+			}
+			dfs(nr, nc, seen)
+		}
+	}
+	for r := 0; r < rows; r++ {
+		dfs(r, 0, pac)
+		dfs(r, cols-1, atl)
+	}
+	for c := 0; c < cols; c++ {
+		dfs(0, c, pac)
+		dfs(rows-1, c, atl)
+	}
+	result := [][]int{}
+	for r := 0; r < rows; r++ {
+		for c := 0; c < cols; c++ {
+			if pac[r][c] && atl[r][c] {
+				result = append(result, []int{r, c})
+			}
+		}
+	}
+	return result
+}`,
+    },
+    tests: [
+      {
+        input: [[[1, 2, 2, 3, 5], [3, 2, 3, 4, 4], [2, 4, 5, 3, 1], [6, 7, 1, 4, 5], [5, 1, 1, 2, 4]]],
+        expected: [[0, 4], [1, 3], [1, 4], [2, 2], [3, 0], [3, 1], [4, 0]],
+      },
+      { input: [[[1]]], expected: [[0, 0]] },
+    ],
+    goHarness: pacificAtlanticGoHarness,
+    complexity: { time: "O(rows * cols)", space: "O(rows * cols)" },
+    explanation:
+      "Checking every cell to see where its water ends up would repeat a lot of work. Instead we go backwards from the oceans. Starting from every cell on the Pacific edge, we walk to neighbors that are the same height or higher, because those are exactly the cells whose water could flow down to where we came from. We mark everything reached this way. We do the same from the Atlantic edge with a second marking grid. Any cell marked in both grids can send water to both oceans.",
+  },
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
 ];
 
 export function getProblem(slug: string): Problem | undefined {
@@ -3806,11 +4490,16 @@ export interface TopicSummary {
   slug: string;
   label: string;
   count: number;
+<<<<<<< HEAD
+=======
+  problemSlugs: string[];
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
 }
 
 // Returns every real topic plus a synthetic "AWS Favorites" bucket (tag-based,
 // can overlap with real topics) for the topic-select screen.
 export function getTopicList(): TopicSummary[] {
+<<<<<<< HEAD
   const counts = new Map<string, number>();
   for (const p of PROBLEMS) {
     counts.set(p.topic, (counts.get(p.topic) || 0) + 1);
@@ -3823,6 +4512,26 @@ export function getTopicList(): TopicSummary[] {
   const awsCount = PROBLEMS.filter((p) => p.tags?.includes("aws")).length;
   return [
     { slug: AWS_FAVORITES_SLUG, label: "AWS Interview Favorites", count: awsCount },
+=======
+  const byTopic = new Map<string, string[]>();
+  for (const p of PROBLEMS) {
+    byTopic.set(p.topic, [...(byTopic.get(p.topic) || []), p.slug]);
+  }
+  const topics: TopicSummary[] = Array.from(byTopic.entries()).map(([topic, slugs]) => ({
+    slug: slugifyTopic(topic),
+    label: topic,
+    count: slugs.length,
+    problemSlugs: slugs,
+  }));
+  const awsSlugs = PROBLEMS.filter((p) => p.tags?.includes("aws")).map((p) => p.slug);
+  return [
+    {
+      slug: AWS_FAVORITES_SLUG,
+      label: "AWS Interview Favorites",
+      count: awsSlugs.length,
+      problemSlugs: awsSlugs,
+    },
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
     ...topics,
   ];
 }

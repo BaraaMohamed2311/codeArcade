@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // Pattern cheat sheet: memorize these ~14 shapes and you can derive most of
+=======
+// Pattern cheat sheet: memorize these shapes and you can derive most of
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
 // the problems in the arcade from them. Each pattern has one canonical JS
 // implementation (the shape is what matters — the same structure drops into
 // Python or Go with that language's queue/stack/map), plus a one-line note
@@ -64,7 +68,11 @@ export const PATTERNS: Pattern[] = [
       {
         slug: "longest-substring",
         title: "Longest Substring Without Repeating Characters",
+<<<<<<< HEAD
         tweak: "This is the base template, unchanged.",
+=======
+        tweak: "This is the base template. The one line to memorize is left = lastSeen[ch] + 1: when the new character repeats inside the window, jump the left edge just past its previous position.",
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
       },
     ],
   },
@@ -88,7 +96,11 @@ export const PATTERNS: Pattern[] = [
       {
         slug: "container-with-most-water",
         title: "Container With Most Water",
+<<<<<<< HEAD
         tweak: "This is the base template, unchanged.",
+=======
+        tweak: "This is the base template. The one line to memorize is the move rule: always move the pointer at the SHORTER wall inward, because the shorter wall is what limits the area.",
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
       },
     ],
   },
@@ -110,7 +122,11 @@ export const PATTERNS: Pattern[] = [
       {
         slug: "lower-bound",
         title: "Lower Bound (First Index >= Target)",
+<<<<<<< HEAD
         tweak: "This is the base template directly — check(mid) = arr[mid] >= target.",
+=======
+        tweak: "This is the base template. The only line that changes between binary-search problems is the check: here check(mid) is arr[mid] >= target, and the answer is the first spot where it becomes true.",
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
       },
       {
         slug: "binary-search",
@@ -144,7 +160,11 @@ export const PATTERNS: Pattern[] = [
         slug: "subsets",
         title: "Subsets (Power Set)",
         tweak:
+<<<<<<< HEAD
           "This is the base template directly — every partial path gets recorded immediately, since every subset (not just the full ones) is a valid answer.",
+=======
+          "This is the base template. Record a copy of the current path at the very start of every call (every partial path is a valid subset), then loop over the remaining choices: choose, recurse, undo.",
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
       },
     ],
   },
@@ -193,7 +213,11 @@ export const PATTERNS: Pattern[] = [
       {
         slug: "max-lectures",
         title: "Maximum Number of Lectures in One Hall",
+<<<<<<< HEAD
         tweak: "This is the base template directly.",
+=======
+        tweak: "This is the base template. Sort by END time, then take a lecture whenever its start is at or after the end of the last one you took.",
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
       },
       {
         slug: "merge-intervals",
@@ -229,7 +253,11 @@ export const PATTERNS: Pattern[] = [
       {
         slug: "valid-parentheses",
         title: "Valid Parentheses",
+<<<<<<< HEAD
         tweak: "This is the base template, unchanged.",
+=======
+        tweak: "This is the base template. Closers are looked up in a pairs map (closer to opener); anything else is an opener and gets pushed. Fail if the popped opener is wrong, and also fail if the stack is not empty at the end.",
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
       },
     ],
   },
@@ -262,12 +290,20 @@ function hasCycle(head) {
       {
         slug: "reverse-linked-list",
         title: "Reverse a Linked List",
+<<<<<<< HEAD
         tweak: "This is the base reverseList template directly.",
+=======
+        tweak: "This is the base template. Three pointers (prev, cur, next): save next, point cur backwards at prev, then step both forward. Return prev, not cur.",
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
       },
       {
         slug: "detect-cycle",
         title: "Detect a Cycle in a Linked List",
+<<<<<<< HEAD
         tweak: "This is the base hasCycle template directly (fast and slow pointers).",
+=======
+        tweak: "This is the base template. Slow moves 1 step, fast moves 2; if they ever land on the same node there is a loop, and if fast reaches the end there is none.",
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
       },
     ],
   },
@@ -312,6 +348,27 @@ function hasCycle(head) {
         tweak:
           "Same height-finding combine as max depth (1 + max(left, right)), but with a side-effect: before returning, check if left-height + right-height beats a running best-so-far, even though the return value itself is still just a height.",
       },
+<<<<<<< HEAD
+=======
+      {
+        slug: "symmetric-tree",
+        title: "Symmetric Tree",
+        tweak:
+          "Run the DFS on two nodes at once instead of one. Recurse into the crossed pairs (a.left with b.right, and a.right with b.left) instead of the same-side pairs; both-null is true, one-null is false.",
+      },
+      {
+        slug: "lowest-common-ancestor",
+        title: "Lowest Common Ancestor of a Binary Tree",
+        tweak:
+          "The DFS returns the node it found instead of a number. Return the node as soon as it equals p or q; if both the left and right calls return something, the current node is the answer, otherwise pass up whichever side found something.",
+      },
+      {
+        slug: "balanced-binary-tree",
+        title: "Balanced Binary Tree",
+        tweak:
+          "Same height-finding DFS as max depth, plus one check: if the two sides differ by more than 1, return -1, and any caller that receives -1 passes -1 straight up. The tree is balanced if the final answer is not -1.",
+      },
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
     ],
   },
   {
@@ -394,6 +451,27 @@ function hasCycle(head) {
         tweak:
           "'Neighbor' no longer means up/down/left/right on a grid — it means any city j where the adjacency matrix says city i and city j are connected (matrix[i][j] === 1).",
       },
+<<<<<<< HEAD
+=======
+      {
+        slug: "graph-valid-tree",
+        title: "Graph Valid Tree",
+        tweak:
+          "Not a grid: neighbors come from an adjacency list built from the edges. First reject if edges is not n-1, then run one fill from node 0 and check that it visited all n nodes. The edge count rules out cycles.",
+      },
+      {
+        slug: "surrounded-regions",
+        title: "Surrounded Regions",
+        tweak:
+          "Start the fill only from the border cells that are O, not from every cell, marking what it reaches with a temporary S. Then one last pass flips every remaining O to X and every S back to O.",
+      },
+      {
+        slug: "pacific-atlantic",
+        title: "Pacific Atlantic Water Flow",
+        tweak:
+          "Run the fill twice, once from the top and left edges and once from the bottom and right edges, each with its own visited grid. A neighbor is allowed only if it is the same height or higher (water flows downhill, so we walk uphill). Answer cells are visited in both grids.",
+      },
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
     ],
   },
   {
@@ -446,6 +524,200 @@ function hasCycle(head) {
       },
     ],
   },
+<<<<<<< HEAD
+=======
+  {
+    id: "union-find",
+    name: "Union-Find (Disjoint Set)",
+    description:
+      "Every node points to a parent; the node at the top of a chain is its group's leader. find() walks up to the leader, union() joins two groups by pointing one leader at the other. If find says two nodes already share a leader, connecting them would make a cycle.",
+    code: `function unionFind(n, edges) {
+  const parent = Array.from({ length: n }, (_, i) => i);
+  const rank = Array(n).fill(0);
+  function find(x) {
+    while (parent[x] !== x) {
+      parent[x] = parent[parent[x]]; // shorten the chain as we climb
+      x = parent[x];
+    }
+    return x;
+  }
+  function union(a, b) {
+    const ra = find(a), rb = find(b);
+    if (ra === rb) return false; // already in the same group: this edge makes a cycle
+    if (rank[ra] < rank[rb]) parent[ra] = rb;
+    else if (rank[ra] > rank[rb]) parent[rb] = ra;
+    else { parent[rb] = ra; rank[ra]++; }
+    return true;
+  }
+  let groups = n;
+  for (const [a, b] of edges) if (union(a, b)) groups--;
+  return groups;
+}`,
+    usedBy: [
+      {
+        slug: "number-of-provinces",
+        title: "Number of Provinces",
+        tweak:
+          "Alternative to the DFS version. Instead of edges, loop over the matrix cells where isConnected[i][j] is 1 and union(i, j). The answer is the final groups count.",
+      },
+      {
+        slug: "graph-valid-tree",
+        title: "Graph Valid Tree",
+        tweak:
+          "Alternative to the DFS version. If union() returns false for any edge, that edge closes a cycle, so return false. At the end the graph is a tree only if groups is exactly 1.",
+      },
+    ],
+  },
+  {
+    id: "topological-sort",
+    name: "Topological Sort (Kahn's Algorithm)",
+    description:
+      "Count how many things each node is waiting on (its indegree). Start with the nodes waiting on nothing, and every time you finish one, lower the count of everything that depended on it. If you cannot finish every node, there is a cycle.",
+    code: `function topoSort(n, prereqs) {
+  // prereqs: [node, mustComeBefore]
+  const adj = Array.from({ length: n }, () => []);
+  const indegree = Array(n).fill(0);
+  for (const [node, before] of prereqs) {
+    adj[before].push(node);
+    indegree[node]++;
+  }
+  const queue = [];
+  for (let i = 0; i < n; i++) if (indegree[i] === 0) queue.push(i);
+  const order = [];
+  while (queue.length) {
+    const cur = queue.shift();
+    order.push(cur);
+    for (const next of adj[cur]) {
+      if (--indegree[next] === 0) queue.push(next);
+    }
+  }
+  return order.length === n ? order : []; // short order means a cycle
+}`,
+    usedBy: [
+      {
+        slug: "course-schedule",
+        title: "Course Schedule",
+        tweak:
+          "Alternative to the DFS cycle check. Return order.length === n (can every course be finished?) instead of returning the order itself.",
+      },
+    ],
+  },
+];
+
+// "Twist drills": the same base pattern with one small change, which is the
+// kind of variation an interviewer is likely to ask for. Each line says what to
+// change in the template you already memorized.
+export interface TwistDrill {
+  base: string; // the problem you already know
+  twist: string; // the variation you might be asked
+  change: string; // exactly what to change
+  patternId: string;
+}
+
+export const TWIST_DRILLS: TwistDrill[] = [
+  {
+    base: "Right Side View",
+    twist: "Left Side View",
+    change: "Visit the left child before the right child. Nothing else changes.",
+    patternId: "tree-dfs",
+  },
+  {
+    base: "Right Side View",
+    twist: "Right Side View using BFS",
+    change: "Switch to the level-order BFS and keep only the last value of each ring.",
+    patternId: "bfs",
+  },
+  {
+    base: "Level Order Traversal",
+    twist: "Zigzag Level Order",
+    change: "Same ring-by-ring BFS; reverse the list of values on every second ring.",
+    patternId: "bfs",
+  },
+  {
+    base: "Maximum Depth of a Binary Tree",
+    twist: "Minimum Depth",
+    change: "Same height DFS, but a node with only one child is not a leaf: only take the min over sides that exist, otherwise you return 1 too early.",
+    patternId: "tree-dfs",
+  },
+  {
+    base: "Symmetric Tree",
+    twist: "Same Tree / Subtree Check",
+    change: "Pair the SAME sides (a.left with b.left, a.right with b.right) instead of crossing them. Subtree check runs this at every node.",
+    patternId: "tree-dfs",
+  },
+  {
+    base: "Invert a Binary Tree",
+    twist: "Check if two trees are mirrors",
+    change: "Keep the invert idea, but compare instead of building: that is the Symmetric Tree pairing.",
+    patternId: "tree-dfs",
+  },
+  {
+    base: "Lowest Common Ancestor of a Binary Tree",
+    twist: "Lowest Common Ancestor of a BST",
+    change: "Use the ordering: if both values are smaller than the node go left, if both are larger go right, otherwise the current node is the answer. No search of both sides needed.",
+    patternId: "tree-dfs",
+  },
+  {
+    base: "Validate Binary Search Tree",
+    twist: "Kth Smallest Element in a BST",
+    change: "Walk left, node, right (in-order), which visits values in sorted order, and stop on the kth visit.",
+    patternId: "tree-dfs",
+  },
+  {
+    base: "Shortest Path in an Unweighted Graph",
+    twist: "Shortest path from several starts (Rotten Oranges style)",
+    change: "Put every starting node in the queue before the loop begins, all at distance 0.",
+    patternId: "bfs",
+  },
+  {
+    base: "Number of Islands",
+    twist: "Max Area of Island",
+    change: "Make the fill return the number of cells it covered (1 plus the four neighbor calls) and keep the biggest.",
+    patternId: "dfs-flood-fill",
+  },
+  {
+    base: "Number of Islands",
+    twist: "Surrounded Regions / Pacific Atlantic",
+    change: "Stop starting fills from every cell. Start them only from the border cells (and for Pacific Atlantic, walk uphill from the ocean edges).",
+    patternId: "dfs-flood-fill",
+  },
+  {
+    base: "Number of Provinces",
+    twist: "Number of Connected Components from an edge list",
+    change: "Same count of groups; build neighbors from the edge list, or use Union-Find and subtract one for every successful union.",
+    patternId: "union-find",
+  },
+  {
+    base: "Course Schedule",
+    twist: "Course Schedule II (return the order)",
+    change: "Return the order array from Kahn's algorithm instead of just checking its length. Return an empty list if it is shorter than n.",
+    patternId: "topological-sort",
+  },
+  {
+    base: "Maximum Number of Lectures in One Hall",
+    twist: "Merge Overlapping Intervals",
+    change: "Sort by START instead of end, and stretch the last kept interval's end rather than counting picks.",
+    patternId: "greedy-intervals",
+  },
+  {
+    base: "Kth Largest Element in an Array",
+    twist: "Kth Smallest Element in an Array",
+    change: "Flip the heap: keep a MAX-heap of size k, and the answer is its root.",
+    patternId: "heap-topk",
+  },
+  {
+    base: "Lower Bound (First Index >= Target)",
+    twist: "Upper Bound / First Bad Version",
+    change: "Only the check changes: arr[mid] > target for upper bound, or isBad(mid) for First Bad Version. The halving loop stays the same.",
+    patternId: "binary-search",
+  },
+  {
+    base: "Longest Substring Without Repeating Characters",
+    twist: "Longest substring with at most k distinct characters",
+    change: "Keep a count per character in the window and move the left edge forward while the number of distinct characters is above k.",
+    patternId: "sliding-window",
+  },
+>>>>>>> 654a063 (cheatsheets and aws roadmap)
 ];
 
 export function getPattern(id: string): Pattern | undefined {
