@@ -1,15 +1,5 @@
 "use client";
 
-<<<<<<< HEAD
-import Link from "next/link";
-import { PATTERNS } from "../../lib/cheatsheet";
-import { sfx } from "../../lib/sound";
-
-export default function CheatSheetPage() {
-  return (
-    <main className="wrap">
-      <Link className="back-link" href="/" onClick={() => sfx.click()}>
-=======
 import { useState } from "react";
 import Link from "next/link";
 import { PATTERNS, TWIST_DRILLS } from "../../lib/cheatsheet";
@@ -26,6 +16,9 @@ export default function CheatSheetPage() {
   const patterns = PATTERNS.map((p) => ({
     ...p,
     usedBy: awsOnly ? p.usedBy.filter((u) => AWS_SLUGS.has(u.slug)) : p.usedBy,
+    problemTable: awsOnly
+      ? p.problemTable?.filter((r) => r.slug && AWS_SLUGS.has(r.slug))
+      : p.problemTable,
   })).filter((p) => p.usedBy.length > 0);
 
   const patternIds = new Set(patterns.map((p) => p.id));
@@ -34,7 +27,6 @@ export default function CheatSheetPage() {
   return (
     <main className="wrap cheatsheet">
       <Link className="back-link no-print" href="/" onClick={() => sfx.click()}>
->>>>>>> 654a063 (cheatsheets and aws roadmap)
         ← back to topics
       </Link>
 
@@ -44,19 +36,12 @@ export default function CheatSheetPage() {
         </h1>
       </div>
 
-<<<<<<< HEAD
-      <p style={{ color: "var(--text-dim)", fontSize: 19, maxWidth: 760, marginBottom: 30 }}>
-=======
       <p style={{ color: "var(--text-dim)", fontSize: 19, maxWidth: 760, marginBottom: 20 }}>
->>>>>>> 654a063 (cheatsheets and aws roadmap)
         {PATTERNS.length} shapes cover every problem in the arcade. Memorize the base code block
         for each one, then memorize the one-line tweak per problem — that's the whole game.
         Click any problem name to go solve it.
       </p>
 
-<<<<<<< HEAD
-      {PATTERNS.map((pattern) => (
-=======
       <div className="cheat-controls no-print">
         <button
           className={`filter-chip ${awsOnly ? "active" : ""}`}
@@ -100,11 +85,50 @@ export default function CheatSheetPage() {
       </nav>
 
       {patterns.map((pattern) => (
->>>>>>> 654a063 (cheatsheets and aws roadmap)
         <section className="pattern-block" key={pattern.id} id={pattern.id}>
           <h2>{pattern.name}</h2>
           <p className="pattern-desc">{pattern.description}</p>
           <pre className="pattern-code">{pattern.code}</pre>
+          {pattern.scenario && (
+            <div className="pattern-scenario">
+              <h3>Question scenario</h3>
+              <p>{pattern.scenario}</p>
+            </div>
+          )}
+          {pattern.problemTable ? (
+            <>
+              <h3 className="table-heading">Problems and tweaks</h3>
+              <table className="tweak-table">
+                <thead>
+                  <tr>
+                    <th>Level</th>
+                    <th>Problem</th>
+                    <th>How it tweaks the base pattern</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pattern.problemTable.map((r) => (
+                    <tr key={r.problem}>
+                      <td>
+                        <span className={`level-tag level-${r.level.toLowerCase()}`}>{r.level}</span>
+                      </td>
+                      <td>
+                        {r.slug ? (
+                          <Link href={`/problem/${r.slug}`} onClick={() => sfx.click()}>
+                            {r.problem}
+                          </Link>
+                        ) : (
+                          r.problem
+                        )}
+                        {r.slug && AWS_SLUGS.has(r.slug) && <span className="aws-badge"> ⭐</span>}
+                      </td>
+                      <td>{r.tweak}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          ) : (
           <table className="tweak-table">
             <thead>
               <tr>
@@ -119,20 +143,16 @@ export default function CheatSheetPage() {
                     <Link href={`/problem/${u.slug}`} onClick={() => sfx.click()}>
                       {u.title}
                     </Link>
-<<<<<<< HEAD
-=======
                     {AWS_SLUGS.has(u.slug) && <span className="aws-badge"> ⭐</span>}
->>>>>>> 654a063 (cheatsheets and aws roadmap)
                   </td>
                   <td>{u.tweak}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          )}
         </section>
       ))}
-<<<<<<< HEAD
-=======
 
       <section className="pattern-block" id="twist-drills">
         <h2>Twist Drills</h2>
@@ -164,7 +184,6 @@ export default function CheatSheetPage() {
           </tbody>
         </table>
       </section>
->>>>>>> 654a063 (cheatsheets and aws roadmap)
     </main>
   );
 }

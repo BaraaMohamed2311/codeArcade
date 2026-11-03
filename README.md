@@ -1,20 +1,11 @@
 # CODE ARCADE
 
-<<<<<<< HEAD
-A personal, arcade-styled LeetCode/NeetCode-style practice site. 30 problems
-across 14 core patterns (hashing, sliding window, two pointers, binary
-search, intervals/greedy, stacks, linked lists, trees, graphs, DP,
-backtracking, heaps, LRU design). The idea is repetition, not volume — solve
-the same scenario until the pattern is automatic. Every solve is counted and
-turns into XP/levels.
-=======
 A personal, arcade-styled LeetCode/NeetCode-style practice site. 36 problems
 across 13 topics and 16 core patterns (hashing, sliding window, two pointers,
 binary search, intervals/greedy, stacks, linked lists, trees, graphs, union-find,
 topological sort, DP, backtracking, heaps, LRU design). The idea is
 repetition, not volume — solve the same scenario until the pattern is
 automatic. Every solve is counted and turns into XP/levels.
->>>>>>> 654a063 (cheatsheets and aws roadmap)
 
 Write code in **JavaScript, Python, or Go**, run it for real against test
 cases, and see pass/fail output in an in-page console. Reveal the solution
@@ -24,19 +15,6 @@ explanation (no analogies) and the annotated reference code.
 ## Browsing
 
 - The home page is a **topic picker** — click a topic to see just that
-<<<<<<< HEAD
-  topic's problems. One of the "topics" is **⭐ AWS Interview Favorites**: a
-  tag-based bucket (`tags: ["aws"]` in `lib/problems.ts`) pulling together
-  the problems most likely to come up in an AWS interview — heavy on trees
-  and graphs, plus twisted variants of common ones (right-side view instead
-  of plain depth, invert instead of just traverse, etc.), per interview
-  feedback, alongside AWS staples like LRU Cache and Kth Largest Element.
-- **`/cheatsheet`** is a single page listing the ~14 underlying patterns,
-  each with one canonical code block, plus a one-line note per problem on
-  exactly what was tweaked to turn that base pattern into that specific
-  problem. Built for memorizing the shape instead of grinding every problem
-  individually — see `lib/cheatsheet.ts`.
-=======
   topic's problems. Each card shows how many problems it has and how many
   you have solved. One of the "topics" is **⭐ AWS Interview Favorites**: a
   tag-based bucket (`tags: ["aws"]` in `lib/problems.ts`) with 20 problems
@@ -58,7 +36,6 @@ explanation (no analogies) and the annotated reference code.
   question from interview feedback), and a story bank where you note one
   story per principle. Notes are saved in your browser only
   (`lib/behavioral.ts`).
->>>>>>> 654a063 (cheatsheets and aws roadmap)
 
 ## How it works
 

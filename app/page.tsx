@@ -3,11 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getTopicList, AWS_FAVORITES_SLUG } from "../lib/problems";
-<<<<<<< HEAD
-import { totalSolves, xpForSolves, levelFromXp } from "../lib/progress";
-=======
 import { totalSolves, xpForSolves, levelFromXp, getAllProgress } from "../lib/progress";
->>>>>>> 654a063 (cheatsheets and aws roadmap)
 import { sfx } from "../lib/sound";
 
 export default function Home() {
@@ -77,12 +73,6 @@ export default function Home() {
         <Link href="/cheatsheet" className="nav-link" onClick={() => sfx.click()}>
           📋 PATTERN CHEAT SHEET
         </Link>
-<<<<<<< HEAD
-      </div>
-
-      <div className="grid">
-        {topics.map((t) => (
-=======
         <Link href="/behavioral" className="nav-link" onClick={() => sfx.click()}>
           🎤 BEHAVIORAL PREP
         </Link>
@@ -93,7 +83,6 @@ export default function Home() {
           const done = t.problemSlugs.filter((s) => solvedSlugs.has(s)).length;
           const donePct = t.count ? Math.round((done / t.count) * 100) : 0;
           return (
->>>>>>> 654a063 (cheatsheets and aws roadmap)
           <Link
             href={`/topic/${t.slug}`}
             key={t.slug}
@@ -102,10 +91,6 @@ export default function Home() {
           >
             <h3>{t.slug === AWS_FAVORITES_SLUG ? "⭐ " : ""}{t.label}</h3>
             <span className="count">{t.count} problem{t.count === 1 ? "" : "s"}</span>
-<<<<<<< HEAD
-          </Link>
-        ))}
-=======
             <span className="topic-progress-label">{done}/{t.count} solved</span>
             <div className="topic-progress">
               <div className="topic-progress-fill" style={{ width: `${donePct}%` }} />
@@ -113,7 +98,6 @@ export default function Home() {
           </Link>
           );
         })}
->>>>>>> 654a063 (cheatsheets and aws roadmap)
       </div>
 
       <h2 className="section-title">DAILY REMINDER</h2>

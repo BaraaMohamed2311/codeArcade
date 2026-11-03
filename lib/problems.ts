@@ -1172,8 +1172,6 @@ func main() {
 }
 `;
 
-<<<<<<< HEAD
-=======
 const goTreeHelpers = `func n(v int, l, r *TreeNode) *TreeNode { return &TreeNode{Val: v, Left: l, Right: r} }`;
 
 const goMiniMain = (body: string) => `package main
@@ -1260,7 +1258,6 @@ const pacificAtlanticGoHarness = (code: string) =>
     code
   );
 
->>>>>>> 654a063 (cheatsheets and aws roadmap)
 export const PROBLEMS: Problem[] = [
   {
     slug: "two-sum",
@@ -3876,8 +3873,6 @@ def find_kth_largest(nums, k):
     explanation:
       "We keep a small pile of exactly k numbers, arranged so the smallest one in the pile is always easy to find and remove — that arrangement is called a min-heap. We go through the list once: if the pile has room, a number just joins it; once the pile is full, a new number only gets in if it beats the smallest number currently in the pile, which then gets kicked out. After looking at every number, the smallest number left in the pile of k is exactly the kth largest overall, since the k biggest numbers are the only ones that ever survived in the pile.",
   },
-<<<<<<< HEAD
-=======
   {
     slug: "symmetric-tree",
     title: "Symmetric Tree",
@@ -4470,7 +4465,6 @@ def find_kth_largest(nums, k):
     explanation:
       "Checking every cell to see where its water ends up would repeat a lot of work. Instead we go backwards from the oceans. Starting from every cell on the Pacific edge, we walk to neighbors that are the same height or higher, because those are exactly the cells whose water could flow down to where we came from. We mark everything reached this way. We do the same from the Atlantic edge with a second marking grid. Any cell marked in both grids can send water to both oceans.",
   },
->>>>>>> 654a063 (cheatsheets and aws roadmap)
 ];
 
 export function getProblem(slug: string): Problem | undefined {
@@ -4490,29 +4484,12 @@ export interface TopicSummary {
   slug: string;
   label: string;
   count: number;
-<<<<<<< HEAD
-=======
   problemSlugs: string[];
->>>>>>> 654a063 (cheatsheets and aws roadmap)
 }
 
 // Returns every real topic plus a synthetic "AWS Favorites" bucket (tag-based,
 // can overlap with real topics) for the topic-select screen.
 export function getTopicList(): TopicSummary[] {
-<<<<<<< HEAD
-  const counts = new Map<string, number>();
-  for (const p of PROBLEMS) {
-    counts.set(p.topic, (counts.get(p.topic) || 0) + 1);
-  }
-  const topics: TopicSummary[] = Array.from(counts.entries()).map(([topic, count]) => ({
-    slug: slugifyTopic(topic),
-    label: topic,
-    count,
-  }));
-  const awsCount = PROBLEMS.filter((p) => p.tags?.includes("aws")).length;
-  return [
-    { slug: AWS_FAVORITES_SLUG, label: "AWS Interview Favorites", count: awsCount },
-=======
   const byTopic = new Map<string, string[]>();
   for (const p of PROBLEMS) {
     byTopic.set(p.topic, [...(byTopic.get(p.topic) || []), p.slug]);
@@ -4531,7 +4508,6 @@ export function getTopicList(): TopicSummary[] {
       count: awsSlugs.length,
       problemSlugs: awsSlugs,
     },
->>>>>>> 654a063 (cheatsheets and aws roadmap)
     ...topics,
   ];
 }
